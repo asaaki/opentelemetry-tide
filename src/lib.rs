@@ -143,7 +143,10 @@ fn http_version_str(version: Option<Version>) -> &'static str {
             _ => UNKNOWN,
         }
     } else {
-        "1.1 (assumed)" // tide seems to not set the version correctly, but states it's 1.1 only
+        // tide(<=0.13) seems to not set the version correctly, but states it's 1.1 only
+        // bug: https://github.com/http-rs/tide/issues/671
+        // fix: https://github.com/http-rs/async-h1/pull/131
+        "1.1 (assumed)"
     }
 }
 
