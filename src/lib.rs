@@ -1,3 +1,11 @@
+#![forbid(unsafe_code)]
+#![cfg_attr(feature = "docs", feature(doc_cfg))]
+// #![deny(missing_docs)]
+#![deny(unused_imports)]
+#![deny(missing_debug_implementations)]
+#![doc(test(attr(allow(unused_variables), deny(warnings))))]
+#![allow(clippy::all)]
+
 use {
     http_types::{
         headers::{HeaderName, HeaderValue},
@@ -35,7 +43,7 @@ static NET_HOST_PORT_ATTRIBUTE: &str = "net.host.port";
 static UNKNOWN: &str = "unknown";
 static EMPTY: &str = "";
 
-#[derive(Default)]
+#[derive(Default, Debug)]
 pub struct OpenTelemetryTracingMiddleware {
     _priv: (),
 }
@@ -173,6 +181,7 @@ fn addr_to_tuple(input: &str) -> (String, u16) {
 
 #[inline]
 fn span_status(http_status: tide::StatusCode) -> StatusCode {
+    #[allow(clippy::match_overlapping_arm)]
     match http_status as u16 {
         100..=399 => StatusCode::OK,
         401 => StatusCode::Unauthenticated,
