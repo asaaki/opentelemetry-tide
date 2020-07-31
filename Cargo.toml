@@ -10,11 +10,11 @@ repository = "https://github.com/asaaki/opentelemetry-tide"
 categories = [
   "development-tools::debugging",
   "development-tools::profiling",
-  "https://crates.io/categories/asynchronous",
+  "asynchronous",
   "web-programming",
   "network-programming"
 ]
-keywords = ["tide", "opentelemetry", "jaeger", "async", "tracing", "instrumentation"]
+keywords = ["tide", "opentelemetry", "jaeger", "tracing", "instrumentation"]
 license = "MIT OR Apache-2.0"
 exclude = [
     ".github/*",
