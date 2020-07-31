@@ -8,7 +8,7 @@ async fn main() -> thrift::Result<()> {
     init_tracer()?;
 
     let mut app = tide::new();
-    app.middleware(OpenTelemetryTracingMiddleware::new());
+    app.with(OpenTelemetryTracingMiddleware::new());
     app.at("/").get(|req: Request<()>| async move {
         eprintln!("req.version = {:?}", req.version());
         Ok("Hello, OpenTelemetry!")
