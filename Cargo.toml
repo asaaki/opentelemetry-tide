@@ -16,6 +16,9 @@ categories = [
 ]
 keywords = ["tide", "opentelemetry", "jaeger", "async", "tracing", "instrumentation"]
 license = "MIT OR Apache-2.0"
+exclude = [
+    ".github/*",
+]
 
 [dependencies]
 thrift = "0.13"
