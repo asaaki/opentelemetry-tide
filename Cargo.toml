@@ -4,7 +4,16 @@ version = "0.1.0"
 authors = ["Christoph Grabo <asaaki@mannaz.cc>"]
 edition = "2018"
 readme = "README.md"
-categories = ["development-tools::debugging"]
+description = "OpenTelemetry integration for Tide"
+homepage = "https://github.com/asaaki/opentelemetry-tide"
+repository = "https://github.com/asaaki/opentelemetry-tide"
+categories = [
+  "development-tools::debugging",
+  "development-tools::profiling",
+  "https://crates.io/categories/asynchronous",
+  "web-programming",
+  "network-programming"
+]
 keywords = ["tide", "opentelemetry", "jaeger", "async", "tracing", "instrumentation"]
 license = "MIT OR Apache-2.0"
 
