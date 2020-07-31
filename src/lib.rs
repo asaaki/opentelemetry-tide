@@ -181,17 +181,18 @@ fn addr_to_tuple(input: &str) -> (String, u16) {
 
 #[inline]
 fn span_status(http_status: tide::StatusCode) -> StatusCode {
-    #[allow(clippy::match_overlapping_arm)]
     match http_status as u16 {
         100..=399 => StatusCode::OK,
         401 => StatusCode::Unauthenticated,
         403 => StatusCode::PermissionDenied,
         404 => StatusCode::NotFound,
         429 => StatusCode::ResourceExhausted,
+        #[allow(clippy::match_overlapping_arm)]
         400..=499 => StatusCode::InvalidArgument,
         501 => StatusCode::Unimplemented,
         503 => StatusCode::Unavailable,
         504 => StatusCode::DeadlineExceeded,
+        #[allow(clippy::match_overlapping_arm)]
         500..=599 => StatusCode::Internal,
         _ => StatusCode::Unknown,
     }
