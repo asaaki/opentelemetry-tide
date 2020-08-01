@@ -21,10 +21,10 @@ exclude = [
 ]
 
 [dependencies]
-opentelemetry = "0.7"
-kv-log-macro = "1.0"
-tide = "0.13"
 http-types = "2.3"
+kv-log-macro = "1.0"
+opentelemetry = "0.7"
+tide = "0.13"
 url = "2.1"
 
 [dev-dependencies]
