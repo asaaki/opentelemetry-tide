@@ -21,16 +21,15 @@ exclude = [
 ]
 
 [dependencies]
-thrift = "0.13"
 opentelemetry = "0.7"
-opentelemetry-jaeger = "0.6"
 kv-log-macro = "1.0"
 tide = "0.13"
-futures = "0.3"
 http-types = "2.3"
 url = "2.1"
 
 [dev-dependencies]
 async-std = {version =  "1.6", features = ["attributes"]}
 femme = "2.1"
+opentelemetry-jaeger = "0.6"
+thrift = "0.13"
 # pretty_assertions = "0.6.1"
