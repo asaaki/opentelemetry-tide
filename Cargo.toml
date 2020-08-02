@@ -16,7 +16,7 @@ categories = [
 ]
 keywords = ["tide", "opentelemetry", "jaeger", "tracing", "instrumentation"]
 license = "MIT OR Apache-2.0"
-exclude = [".github/*"]
+exclude = [".assets/*", ".github/*"]
 
 [dependencies]
 http-types = "2.3"

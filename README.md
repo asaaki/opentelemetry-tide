@@ -55,6 +55,8 @@ curl http://localhost:3000/
 firefox http://localhost:16686/
 ```
 
+![example jaeger trace](https://github.com/asaaki/opentelemetry-tide/blob/main/.assets/jaeger-trace.png)
+
 ### Code example
 
 #### `Cargo.toml`
