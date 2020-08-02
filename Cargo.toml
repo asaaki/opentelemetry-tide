@@ -1,6 +1,6 @@
 [package]
 name = "opentelemetry-tide"
-version = "0.2.0"
+version = "0.3.0"
 authors = ["Christoph Grabo <asaaki@mannaz.cc>"]
 edition = "2018"
 readme = "README.md"
@@ -16,9 +16,7 @@ categories = [
 ]
 keywords = ["tide", "opentelemetry", "jaeger", "tracing", "instrumentation"]
 license = "MIT OR Apache-2.0"
-exclude = [
-    ".github/*",
-]
+exclude = [".github/*"]
 
 [dependencies]
 http-types = "2.3"
@@ -29,7 +27,5 @@ url = "2.1"
 
 [dev-dependencies]
 async-std = {version =  "1.6", features = ["attributes"]}
-femme = "2.1"
 opentelemetry-jaeger = "0.6"
 thrift = "0.13"
-# pretty_assertions = "0.6.1"

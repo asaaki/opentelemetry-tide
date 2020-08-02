@@ -1,13 +1,15 @@
-use opentelemetry::{global, sdk};
+use opentelemetry::{api::KeyValue, global, sdk};
 use opentelemetry_tide::OpenTelemetryTracingMiddleware;
 use tide::Request;
 
 #[async_std::main]
 async fn main() -> thrift::Result<()> {
     tide::log::start();
+    // Make sure to initialize the tracer
     init_tracer()?;
 
     let mut app = tide::new();
+    // Here we add the middleware
     app.with(OpenTelemetryTracingMiddleware::new());
     app.at("/").get(|req: Request<()>| async move {
         eprintln!("req.version = {:?}", req.version());
@@ -23,7 +25,7 @@ fn init_tracer() -> thrift::Result<()> {
         .with_agent_endpoint("127.0.0.1:6831".parse().expect("not a valid endpoint"))
         .with_process(opentelemetry_jaeger::Process {
             service_name: "example-server".into(),
-            tags: vec![], // vec![KeyValue::new("exporter", "jaeger")],
+            tags: vec![KeyValue::new("exporter", "jaeger")],
         })
         .init()?;
 
