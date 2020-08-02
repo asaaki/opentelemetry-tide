@@ -11,15 +11,22 @@
     <img src="https://img.shields.io/crates/v/opentelemetry-tide.svg?style=flat-square"
     alt="Crates.io version" />
   </a>
+  <!-- docs.rs -->
+  <a href="https://docs.rs/opentelemetry-tide">
+    <img src="https://img.shields.io/badge/docs.rs-latest-blue.svg?style=flat-square"
+      alt="docs.rs docs" />
+    <!-- <img src="https://docs.rs/opentelemetry-tide/badge.svg"
+      alt="docs.rs docs" /> -->
+  </a>
+  <!-- CI -->
+  <a href="https://crates.io/crates/opentelemetry-tide">
+    <img src="https://img.shields.io/github/workflow/status/asaaki/opentelemetry-tide/CI/main?style=flat-square"
+      alt="CI status" />
+  </a>
   <!-- Downloads -->
   <a href="https://crates.io/crates/opentelemetry-tide">
     <img src="https://img.shields.io/crates/d/opentelemetry-tide.svg?style=flat-square"
       alt="Download" />
-  </a>
-  <!-- docs.rs docs -->
-  <a href="https://docs.rs/opentelemetry-tide">
-    <img src="https://img.shields.io/badge/docs-latest-blue.svg?style=flat-square"
-      alt="docs.rs docs" />
   </a>
 </div>
 
