@@ -123,8 +123,8 @@ impl OpenTelemetryTracingMiddleware {
     /// // make sure to initialize the tracer first
     ///
     /// let mut app = tide::new();
-    /// app.with(opentelemetry::OpenTelemetryTracingMiddleware::new());
-    /// app.at("/").get(|_| async { Ok("Traced!") })
+    /// app.with(opentelemetry_tide::OpenTelemetryTracingMiddleware::new());
+    /// app.at("/").get(|_| async { Ok("Traced!") });
     /// ```
     pub fn new() -> Self {
         Self { _priv: () }
