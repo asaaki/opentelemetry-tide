@@ -27,27 +27,16 @@ jobs:
         profile: minimal
         override: true
 
-    - name: Cache cargo registry
-      uses: actions/cache@v1
+    - name: Cache cargo stuff
+      uses: actions/cache@v2
       with:
-        path: ~/.cargo/registry
-        key: ${{ runner.os }}-${{ matrix.rust }}-cargo-registry-${{ hashFiles('**/Cargo.toml', '**/src/lib.rs') }}
+        path: |
+          ~/.cargo/registry
+          ~/.cargo/git
+          target
+        key: ${{ runner.os }}-${{ matrix.rust }}-cargo-${{ hashFiles('**/Cargo.toml', '**/src/lib.rs') }}
         restore-keys: |
-          ${{ runner.os }}-${{ matrix.rust }}-cargo-registry-
-    - name: Cache cargo git
-      uses: actions/cache@v1
-      with:
-        path: ~/.cargo/git
-        key: ${{ runner.os }}-${{ matrix.rust }}-cargo-git-${{ hashFiles('**/Cargo.toml', '**/src/lib.rs') }}
-        restore-keys: |
-          ${{ runner.os }}-${{ matrix.rust }}-cargo-git-
-    - name: Cache cargo build
-      uses: actions/cache@v1
-      with:
-        path: target
-        key: ${{ runner.os }}-${{ matrix.rust }}-cargo-build-target-${{ hashFiles('**/Cargo.toml', '**/src/lib.rs') }}
-        restore-keys: |
-          ${{ runner.os }}-${{ matrix.rust }}-cargo-build-target-
+          ${{ runner.os }}-${{ matrix.rust }}-cargo-
 
     - name: Run cargo fetch
       uses: actions-rs/cargo@v1
@@ -78,29 +67,16 @@ jobs:
         override: true
         components: rustfmt, clippy
 
-    - name: Cache cargo registry
-      uses: actions/cache@v1
+    - name: Cache cargo stuff
+      uses: actions/cache@v2
       with:
-        path: ~/.cargo/registry
-        key: ${{ runner.os }}-lint-cargo-registry-${{ hashFiles('**/Cargo.toml', '**/src/lib.rs') }}
+        path: |
+          ~/.cargo/registry
+          ~/.cargo/git
+          target
+        key: ${{ runner.os }}-${{ matrix.rust }}-lint-${{ hashFiles('**/Cargo.toml', '**/src/lib.rs') }}
         restore-keys: |
-          ${{ runner.os }}-lint-cargo-registry-
-    - name: Cache cargo git
-      uses: actions/cache@v1
-      with:
-        path: ~/.cargo/git
-        key: ${{ runner.os }}-lint-cargo-git-${{ hashFiles('**/Cargo.toml', '**/src/lib.rs') }}
-        restore-keys: |
-          ${{ runner.os }}-lint-cargo-git-
-    - name: Cache cargo build
-      uses: actions/cache@v1
-      with:
-        path: target
-        key: ${{ runner.os }}-lint-cargo-build-target-${{ hashFiles('**/Cargo.toml', '**/src/lib.rs') }}
-        restore-keys: |
-          ${{ runner.os }}-lint-cargo-build-target-
-
-    - run: mkdir -p ~/.cargo/git
+          ${{ runner.os }}-${{ matrix.rust }}-lint-
 
     - name: Run cargo fetch
       uses: actions-rs/cargo@v1
@@ -155,27 +131,16 @@ jobs:
         profile: minimal
         override: true
 
-    - name: Cache cargo registry
-      uses: actions/cache@v1
+    - name: Cache cargo stuff
+      uses: actions/cache@v2
       with:
-        path: ~/.cargo/registry
-        key: ${{ runner.os }}-${{ matrix.rust }}-cargo-registry-${{ hashFiles('**/Cargo.toml', '**/src/lib.rs') }}
+        path: |
+          ~/.cargo/registry
+          ~/.cargo/git
+          target
+        key: ${{ runner.os }}-${{ matrix.rust }}-cargo-${{ hashFiles('**/Cargo.toml', '**/src/lib.rs') }}
         restore-keys: |
-          ${{ runner.os }}-${{ matrix.rust }}-cargo-registry-
-    - name: Cache cargo git
-      uses: actions/cache@v1
-      with:
-        path: ~/.cargo/git
-        key: ${{ runner.os }}-${{ matrix.rust }}-cargo-git-${{ hashFiles('**/Cargo.toml', '**/src/lib.rs') }}
-        restore-keys: |
-          ${{ runner.os }}-${{ matrix.rust }}-cargo-git-
-    - name: Cache cargo build
-      uses: actions/cache@v1
-      with:
-        path: target
-        key: ${{ runner.os }}-${{ matrix.rust }}-cargo-build-target-${{ hashFiles('**/Cargo.toml', '**/src/lib.rs') }}
-        restore-keys: |
-          ${{ runner.os }}-${{ matrix.rust }}-cargo-build-target-
+          ${{ runner.os }}-${{ matrix.rust }}-cargo-
 
     - name: Run cargo fetch
       uses: actions-rs/cargo@v1
