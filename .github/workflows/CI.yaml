@@ -15,7 +15,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        os: [ubuntu-latest, windows-latest, macos-latest]
         rust: [stable, beta]
 
     steps:
@@ -110,52 +110,53 @@ jobs:
         command: doc
         args: --no-deps
 
-  # The macos env behaves strangely with cargo target dir caching;
-  # for now we isolate this build here for separate experimentation,
-  # also this build is allowed to fail
-  build_macos:
-    name: Build (macos)
-    runs-on: macos-latest
-    continue-on-error: true
-    strategy:
-      fail-fast: true
-      matrix:
-        rust: [stable, beta]
+  # Disabled for now, with cache@v2 macos builds seem to work fine
+  # # The macos env behaves strangely with cargo target dir caching;
+  # # for now we isolate this build here for separate experimentation,
+  # # also this build is allowed to fail
+  # build_macos:
+  #   name: Build (macos)
+  #   runs-on: macos-latest
+  #   continue-on-error: true
+  #   strategy:
+  #     fail-fast: true
+  #     matrix:
+  #       rust: [stable, beta]
 
-    steps:
-    - uses: actions/checkout@v2
+  #   steps:
+  #   - uses: actions/checkout@v2
 
-    - uses: actions-rs/toolchain@v1
-      with:
-        toolchain: ${{ matrix.rust }}
-        profile: minimal
-        override: true
+  #   - uses: actions-rs/toolchain@v1
+  #     with:
+  #       toolchain: ${{ matrix.rust }}
+  #       profile: minimal
+  #       override: true
 
-    - name: Cache cargo stuff
-      uses: actions/cache@v2
-      with:
-        path: |
-          ~/.cargo/registry
-          ~/.cargo/git
-          target
-        key: ${{ runner.os }}-${{ matrix.rust }}-cargo-${{ hashFiles('**/Cargo.toml', '**/src/lib.rs') }}
-        restore-keys: |
-          ${{ runner.os }}-${{ matrix.rust }}-cargo-
+  #   - name: Cache cargo stuff
+  #     uses: actions/cache@v2
+  #     with:
+  #       path: |
+  #         ~/.cargo/registry
+  #         ~/.cargo/git
+  #         target
+  #       key: ${{ runner.os }}-${{ matrix.rust }}-cargo-${{ hashFiles('**/Cargo.toml', '**/src/lib.rs') }}
+  #       restore-keys: |
+  #         ${{ runner.os }}-${{ matrix.rust }}-cargo-
 
-    - name: Run cargo fetch
-      uses: actions-rs/cargo@v1
-      with:
-        command: fetch
+  #   - name: Run cargo fetch
+  #     uses: actions-rs/cargo@v1
+  #     with:
+  #       command: fetch
 
-    - name: Run cargo check
-      uses: actions-rs/cargo@v1
-      with:
-        command: check
-        args: --all --examples
+  #   - name: Run cargo check
+  #     uses: actions-rs/cargo@v1
+  #     with:
+  #       command: check
+  #       args: --all --examples
 
-    # skip testing for now on this target
-    # - name: Run tests
-    #   uses: actions-rs/cargo@v1
-    #   with:
-    #     command: test
-    #     args: --all
+  #   # skip testing for now on this target
+  #   # - name: Run tests
+  #   #   uses: actions-rs/cargo@v1
+  #   #   with:
+  #   #     command: test
+  #   #     args: --all
