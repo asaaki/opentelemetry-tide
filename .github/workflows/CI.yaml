@@ -74,9 +74,9 @@ jobs:
           ~/.cargo/registry
           ~/.cargo/git
           target
-        key: ${{ runner.os }}-${{ matrix.rust }}-lint-${{ hashFiles('**/Cargo.toml', '**/src/lib.rs') }}
+        key: ${{ runner.os }}-lint-${{ hashFiles('**/Cargo.toml', '**/src/lib.rs') }}
         restore-keys: |
-          ${{ runner.os }}-${{ matrix.rust }}-lint-
+          ${{ runner.os }}-lint-
 
     - name: Run cargo fetch
       uses: actions-rs/cargo@v1
