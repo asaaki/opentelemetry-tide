@@ -32,16 +32,22 @@ jobs:
       with:
         path: ~/.cargo/registry
         key: ${{ runner.os }}-${{ matrix.rust }}-cargo-registry-${{ hashFiles('**/Cargo.toml') }}-${{ hashFiles('**/src/lib.rs') }}
+        restore-keys: |
+          ${{ runner.os }}-${{ matrix.rust }}-cargo-registry-
     - name: Cache cargo index
       uses: actions/cache@v1
       with:
         path: ~/.cargo/git
         key: ${{ runner.os }}-${{ matrix.rust }}-cargo-index-${{ hashFiles('**/Cargo.toml') }}-${{ hashFiles('**/src/lib.rs') }}
+        restore-keys: |
+          ${{ runner.os }}-${{ matrix.rust }}-cargo-index-
     - name: Cache cargo build
       uses: actions/cache@v1
       with:
         path: target
         key: ${{ runner.os }}-${{ matrix.rust }}-cargo-build-target-${{ hashFiles('**/Cargo.toml') }}-${{ hashFiles('**/src/lib.rs') }}
+        restore-keys: |
+          ${{ runner.os }}-${{ matrix.rust }}-cargo-build-target-
 
     - name: Run cargo check
       uses: actions-rs/cargo@v1
@@ -72,16 +78,22 @@ jobs:
       with:
         path: ~/.cargo/registry
         key: ${{ runner.os }}-lint-cargo-registry-${{ hashFiles('**/Cargo.toml') }}-${{ hashFiles('**/src/lib.rs') }}
+        restore-keys: |
+          ${{ runner.os }}-lint-cargo-registry-
     - name: Cache cargo index
       uses: actions/cache@v1
       with:
         path: ~/.cargo/git
         key: ${{ runner.os }}-lint-cargo-index-${{ hashFiles('**/Cargo.toml') }}-${{ hashFiles('**/src/lib.rs') }}
+        restore-keys: |
+          ${{ runner.os }}-lint-cargo-index-
     - name: Cache cargo build
       uses: actions/cache@v1
       with:
         path: target
         key: ${{ runner.os }}-lint-cargo-build-target-${{ hashFiles('**/Cargo.toml') }}-${{ hashFiles('**/src/lib.rs') }}
+        restore-keys: |
+          ${{ runner.os }}-lint-cargo-build-target-
 
     - name: clippy
       uses: actions-rs/cargo@v1
