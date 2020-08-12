@@ -44,8 +44,8 @@ jobs:
           ${{ runner.os }}-${{ matrix.rust }}-cargo-git-${{ hashFiles('**/Cargo.toml') }}-
           ${{ runner.os }}-${{ matrix.rust }}-cargo-git-
     - name: Cache cargo build
-      if: ${{ matrix.os }} != "macos-latest"
       uses: actions/cache@v1
+      if: matrix.os != 'macos-latest'
       with:
         path: target
         key: ${{ runner.os }}-${{ matrix.rust }}-cargo-build-target-${{ hashFiles('**/Cargo.toml') }}-${{ hashFiles('**/src/lib.rs') }}
