@@ -19,7 +19,7 @@ license = "MIT OR Apache-2.0"
 exclude = [".assets/*", ".github/*"]
 
 [dependencies]
-http-types = "2.3"
+http-types = "2.4"
 kv-log-macro = "1.0"
 opentelemetry = "0.7"
 tide = "0.13"
