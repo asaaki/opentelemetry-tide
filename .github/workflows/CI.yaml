@@ -34,13 +34,13 @@ jobs:
         key: ${{ runner.os }}-${{ matrix.rust }}-cargo-registry-${{ hashFiles('**/Cargo.toml') }}-${{ hashFiles('**/src/lib.rs') }}
         restore-keys: |
           ${{ runner.os }}-${{ matrix.rust }}-cargo-registry-
-    - name: Cache cargo index
+    - name: Cache cargo git
       uses: actions/cache@v1
       with:
         path: ~/.cargo/git
-        key: ${{ runner.os }}-${{ matrix.rust }}-cargo-index-${{ hashFiles('**/Cargo.toml') }}-${{ hashFiles('**/src/lib.rs') }}
+        key: ${{ runner.os }}-${{ matrix.rust }}-cargo-git-${{ hashFiles('**/Cargo.toml') }}-${{ hashFiles('**/src/lib.rs') }}
         restore-keys: |
-          ${{ runner.os }}-${{ matrix.rust }}-cargo-index-
+          ${{ runner.os }}-${{ matrix.rust }}-cargo-git-
     - name: Cache cargo build
       uses: actions/cache@v1
       with:
@@ -48,6 +48,8 @@ jobs:
         key: ${{ runner.os }}-${{ matrix.rust }}-cargo-build-target-${{ hashFiles('**/Cargo.toml') }}-${{ hashFiles('**/src/lib.rs') }}
         restore-keys: |
           ${{ runner.os }}-${{ matrix.rust }}-cargo-build-target-
+
+    - run: mkdir -p ~/.cargo/git
 
     - name: Run cargo check
       uses: actions-rs/cargo@v1
@@ -80,13 +82,13 @@ jobs:
         key: ${{ runner.os }}-lint-cargo-registry-${{ hashFiles('**/Cargo.toml') }}-${{ hashFiles('**/src/lib.rs') }}
         restore-keys: |
           ${{ runner.os }}-lint-cargo-registry-
-    - name: Cache cargo index
+    - name: Cache cargo git
       uses: actions/cache@v1
       with:
         path: ~/.cargo/git
-        key: ${{ runner.os }}-lint-cargo-index-${{ hashFiles('**/Cargo.toml') }}-${{ hashFiles('**/src/lib.rs') }}
+        key: ${{ runner.os }}-lint-cargo-git-${{ hashFiles('**/Cargo.toml') }}-${{ hashFiles('**/src/lib.rs') }}
         restore-keys: |
-          ${{ runner.os }}-lint-cargo-index-
+          ${{ runner.os }}-lint-cargo-git-
     - name: Cache cargo build
       uses: actions/cache@v1
       with:
@@ -94,6 +96,8 @@ jobs:
         key: ${{ runner.os }}-lint-cargo-build-target-${{ hashFiles('**/Cargo.toml') }}-${{ hashFiles('**/src/lib.rs') }}
         restore-keys: |
           ${{ runner.os }}-lint-cargo-build-target-
+
+    - run: mkdir -p ~/.cargo/git
 
     - name: clippy
       uses: actions-rs/cargo@v1
