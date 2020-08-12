@@ -33,6 +33,7 @@ jobs:
         path: ~/.cargo/registry
         key: ${{ runner.os }}-${{ matrix.rust }}-cargo-registry-${{ hashFiles('**/Cargo.toml') }}-${{ hashFiles('**/src/lib.rs') }}
         restore-keys: |
+          ${{ runner.os }}-${{ matrix.rust }}-cargo-registry-${{ hashFiles('**/Cargo.toml') }}-
           ${{ runner.os }}-${{ matrix.rust }}-cargo-registry-
     - name: Cache cargo git
       uses: actions/cache@v1
@@ -40,6 +41,7 @@ jobs:
         path: ~/.cargo/git
         key: ${{ runner.os }}-${{ matrix.rust }}-cargo-git-${{ hashFiles('**/Cargo.toml') }}-${{ hashFiles('**/src/lib.rs') }}
         restore-keys: |
+          ${{ runner.os }}-${{ matrix.rust }}-cargo-git-${{ hashFiles('**/Cargo.toml') }}-
           ${{ runner.os }}-${{ matrix.rust }}-cargo-git-
     - name: Cache cargo build
       uses: actions/cache@v1
@@ -47,6 +49,7 @@ jobs:
         path: target
         key: ${{ runner.os }}-${{ matrix.rust }}-cargo-build-target-${{ hashFiles('**/Cargo.toml') }}-${{ hashFiles('**/src/lib.rs') }}
         restore-keys: |
+          ${{ runner.os }}-${{ matrix.rust }}-cargo-build-target-${{ hashFiles('**/Cargo.toml') }}-
           ${{ runner.os }}-${{ matrix.rust }}-cargo-build-target-
 
     - run: mkdir -p ~/.cargo/git
@@ -81,6 +84,7 @@ jobs:
         path: ~/.cargo/registry
         key: ${{ runner.os }}-lint-cargo-registry-${{ hashFiles('**/Cargo.toml') }}-${{ hashFiles('**/src/lib.rs') }}
         restore-keys: |
+          ${{ runner.os }}-lint-cargo-registry-${{ hashFiles('**/Cargo.toml') }}-
           ${{ runner.os }}-lint-cargo-registry-
     - name: Cache cargo git
       uses: actions/cache@v1
@@ -88,6 +92,7 @@ jobs:
         path: ~/.cargo/git
         key: ${{ runner.os }}-lint-cargo-git-${{ hashFiles('**/Cargo.toml') }}-${{ hashFiles('**/src/lib.rs') }}
         restore-keys: |
+          ${{ runner.os }}-lint-cargo-git-${{ hashFiles('**/Cargo.toml') }}-
           ${{ runner.os }}-lint-cargo-git-
     - name: Cache cargo build
       uses: actions/cache@v1
@@ -95,6 +100,7 @@ jobs:
         path: target
         key: ${{ runner.os }}-lint-cargo-build-target-${{ hashFiles('**/Cargo.toml') }}-${{ hashFiles('**/src/lib.rs') }}
         restore-keys: |
+          ${{ runner.os }}-lint-cargo-build-target-${{ hashFiles('**/Cargo.toml') }}-
           ${{ runner.os }}-lint-cargo-build-target-
 
     - run: mkdir -p ~/.cargo/git
