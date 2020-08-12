@@ -15,7 +15,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest,  macos-latest, windows-latest]
+        os: [ubuntu-latest, macos-latest, windows-latest]
         rust: [stable, beta]
 
     steps:
@@ -44,6 +44,7 @@ jobs:
           ${{ runner.os }}-${{ matrix.rust }}-cargo-git-${{ hashFiles('**/Cargo.toml') }}-
           ${{ runner.os }}-${{ matrix.rust }}-cargo-git-
     - name: Cache cargo build
+      if: ${{ matrix.os }} != "macos-latest"
       uses: actions/cache@v1
       with:
         path: target
