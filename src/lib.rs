@@ -58,7 +58,7 @@
 #![deny(unused_results)]
 #![doc(test(attr(allow(unused_variables), deny(warnings))))]
 
-use std::convert::TryFrom;
+use std::{convert::TryFrom, net::IpAddr, net::SocketAddr, str::FromStr};
 
 use opentelemetry::{
     trace::{FutureExt, SpanKind, StatusCode, TraceContextExt, Tracer},
@@ -123,12 +123,12 @@ impl<T: Tracer + Send + Sync, State: Clone + Send + Sync + 'static> Middleware<S
             attributes.push(trace::NET_HOST_PORT.i64(port.into()));
         }
 
-        if let Some(addr) = req.remote() {
-            attributes.push(trace::NET_PEER_IP.string(net_addr_ip(addr)));
+        if let Some(addr) = req.remote().and_then(socket_str_to_ip) {
+            attributes.push(trace::NET_PEER_IP.string(addr.to_string()));
         }
 
-        if let Some(addr) = req.peer_addr() {
-            attributes.push(trace::HTTP_CLIENT_IP.string(net_addr_ip(addr)));
+        if let Some(addr) = req.peer_addr().and_then(socket_str_to_ip) {
+            attributes.push(trace::HTTP_CLIENT_IP.string(addr.to_string()));
         }
 
         let span = self
@@ -183,17 +183,8 @@ fn http_target(url: &Url) -> String {
 }
 
 #[inline]
-fn net_addr_ip(input: &str) -> String {
-    let (ip_string, _port) = addr_to_tuple(input);
-    ip_string
-}
-
-#[inline]
-fn addr_to_tuple(input: &str) -> (String, u16) {
-    use std::net::SocketAddr;
-    use std::str::FromStr;
-    let addr: SocketAddr = SocketAddr::from_str(input).expect("malformet socket address str");
-    (addr.ip().to_string(), addr.port())
+fn socket_str_to_ip(socket: &str) -> Option<IpAddr> {
+    SocketAddr::from_str(socket).ok().map(|s| s.ip())
 }
 
 #[inline]
