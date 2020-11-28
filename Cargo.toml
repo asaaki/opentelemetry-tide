@@ -1,6 +1,6 @@
 [package]
 name = "opentelemetry-tide"
-version = "0.3.1"
+version = "0.4.0"
 authors = ["Christoph Grabo <asaaki@mannaz.cc>"]
 edition = "2018"
 readme = "README.md"
@@ -12,20 +12,19 @@ categories = [
   "development-tools::profiling",
   "asynchronous",
   "web-programming",
-  "network-programming"
+  "network-programming",
 ]
 keywords = ["tide", "opentelemetry", "jaeger", "tracing", "instrumentation"]
 license = "MIT OR Apache-2.0"
 exclude = [".assets/*", ".github/*"]
 
 [dependencies]
-http-types = "2.4"
-kv-log-macro = "1.0"
-opentelemetry = "0.7"
-tide = "0.13"
+opentelemetry = "0.10"
+opentelemetry-semantic-conventions = "0.2"
+tide = "0.15"
 url = "2.1"
 
 [dev-dependencies]
-async-std = {version =  "1.6", features = ["attributes"]}
-opentelemetry-jaeger = "0.6"
-thrift = "0.13"
+async-std = { version = "1.7", features = ["attributes"] }
+opentelemetry = { version = "0.10", features = ["async-std"] }
+opentelemetry-jaeger = { version = "0.9", features = ["async-std"] }
