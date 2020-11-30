@@ -95,7 +95,7 @@ impl<T: Tracer + Send + Sync, State: Clone + Send + Sync + 'static> Middleware<S
     for OpenTelemetryTracingMiddleware<T>
 {
     async fn handle(&self, req: Request<State>, next: Next<'_, State>) -> Result {
-        let method = req.method().clone();
+        let method = req.method();
         let url = req.url().clone();
 
         let mut attributes = vec![
