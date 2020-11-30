@@ -172,11 +172,11 @@ fn http_version_str(version: Version) -> &'static str {
 fn http_target(url: &Url) -> String {
     let mut target = String::from(url.path());
     if let Some(q) = url.query() {
-        target.push_str("?");
+        target.push('?');
         target.push_str(q)
     }
     if let Some(f) = url.fragment() {
-        target.push_str("#");
+        target.push('#');
         target.push_str(f);
     }
     target
