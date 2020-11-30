@@ -191,6 +191,7 @@ fn socket_str_to_ip(socket: &str) -> Option<IpAddr> {
 fn span_status(http_status: tide::StatusCode) -> StatusCode {
     match http_status as u16 {
         100..=399 => StatusCode::Ok,
-        _ => StatusCode::Error,
+        400..=599 => StatusCode::Error,
+        _ => StatusCode::Unset,
     }
 }
