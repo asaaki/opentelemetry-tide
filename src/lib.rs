@@ -98,14 +98,11 @@ impl<T: Tracer + Send + Sync, State: Clone + Send + Sync + 'static> Middleware<S
         let method = req.method();
         let url = req.url().clone();
 
-        let mut attributes = vec![
-            trace::HTTP_METHOD.string(method.to_string()),
-            trace::HTTP_SCHEME.string(url.scheme().to_owned()),
-            trace::HTTP_URL.string(url.to_string()),
-            trace::HTTP_TARGET.string(http_target(&url)),
-        ];
-
-        attributes.reserve(6);
+        let mut attributes = Vec::with_capacity(10); // 4 required and 6 optional values
+        attributes.push(trace::HTTP_METHOD.string(method.to_string()));
+        attributes.push(trace::HTTP_SCHEME.string(url.scheme().to_owned()));
+        attributes.push(trace::HTTP_URL.string(url.to_string()));
+        attributes.push(trace::HTTP_TARGET.string(http_target(&url)));
 
         if let Some(version) = req.version() {
             attributes.push(trace::HTTP_FLAVOR.string(http_version_str(version)));
