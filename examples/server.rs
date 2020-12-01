@@ -2,7 +2,7 @@ use opentelemetry_semantic_conventions::resource;
 use opentelemetry_tide::OpenTelemetryTracingMiddleware;
 use tide::Request;
 
-const VERSION: &'static str = env!("CARGO_PKG_VERSION");
+const VERSION: &str = env!("CARGO_PKG_VERSION");
 
 #[async_std::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
