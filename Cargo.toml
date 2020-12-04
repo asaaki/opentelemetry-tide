@@ -30,3 +30,4 @@ kv-log-macro = "1.0"
 async-std = { version = "1.7", features = ["attributes"] }
 opentelemetry = { version = "0.10", features = ["async-std"] }
 opentelemetry-jaeger = { version = "0.9", features = ["async-std"] }
+surf = "2.1"
