@@ -15,8 +15,9 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-20.04, windows-latest, macos-11.0]
+        os: [ubuntu-20.04, windows-latest, macos-latest]
         rust: [stable, beta]
+        cache_counter: [1]
 
     steps:
     - uses: actions/checkout@v2
@@ -34,8 +35,9 @@ jobs:
           ~/.cargo/registry
           ~/.cargo/git
           target
-        key: ${{ runner.os }}-${{ matrix.rust }}-cargo-${{ hashFiles('**/Cargo.toml', '**/src/lib.rs') }}
+        key: ${{ runner.os }}-${{ matrix.rust }}-cargo-${{ hashFiles('**/Cargo.toml', '**/src/lib.rs') }}-${{ matrix.cache_counter }}
         restore-keys: |
+          ${{ runner.os }}-${{ matrix.rust }}-cargo-${{ hashFiles('**/Cargo.toml', '**/src/lib.rs') }}-
           ${{ runner.os }}-${{ matrix.rust }}-cargo-
 
     - name: Run cargo fetch
