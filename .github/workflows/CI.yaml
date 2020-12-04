@@ -35,10 +35,9 @@ jobs:
           ~/.cargo/registry
           ~/.cargo/git
           target
-        key: ${{ runner.os }}-${{ matrix.rust }}-cargo-${{ hashFiles('**/Cargo.toml', '**/src/lib.rs') }}-${{ matrix.cache_counter }}
+        key: ${{ runner.os }}-${{ matrix.rust }}-cargo-${{ matrix.cache_counter }}-${{ hashFiles('**/Cargo.toml', '**/src/lib.rs') }}-${{ matrix.cache_counter }}
         restore-keys: |
-          ${{ runner.os }}-${{ matrix.rust }}-cargo-${{ hashFiles('**/Cargo.toml', '**/src/lib.rs') }}-
-          ${{ runner.os }}-${{ matrix.rust }}-cargo-
+          ${{ runner.os }}-${{ matrix.rust }}-cargo-${{ matrix.cache_counter }}-
 
     - name: Run cargo fetch
       uses: actions-rs/cargo@v1
