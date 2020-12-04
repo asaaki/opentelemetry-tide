@@ -15,7 +15,7 @@
 use http_types::headers::{HeaderName, HeaderValue};
 use opentelemetry::{
     global,
-    trace::{FutureExt, Tracer, TraceContextExt},
+    trace::{FutureExt, TraceContextExt, Tracer},
     Context, KeyValue,
 };
 use opentelemetry_semantic_conventions::resource;
@@ -78,7 +78,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             let cx = Context::current_with_value(span);
             client.send(surf_request).with_context(cx).await
         };
-
 
         let body = format!(
             "upstream responded with: \n{}",
