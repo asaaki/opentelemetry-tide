@@ -15,7 +15,7 @@
 use http_types::headers::{HeaderName, HeaderValue};
 use opentelemetry::{
     global,
-    trace::{FutureExt, Tracer},
+    trace::{FutureExt, Tracer, TraceContextExt},
     Context, KeyValue,
 };
 use opentelemetry_semantic_conventions::resource;
@@ -54,6 +54,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     app.at("/").get(|req: Request<surf::Client>| async move {
         // collect current tracing data, so we can pass it down
         let cx = Context::current();
+        let span = cx.span();
         let mut injector = HashMap::new();
         global::get_text_map_propagator(|propagator| propagator.inject_context(&cx, &mut injector));
 
@@ -70,6 +71,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
         }
 
+        span.add_event("upstream.request.started".into(), vec![]);
         let upstream_res = async {
             let tracer = global::tracer("(child)");
             let span = tracer.start("surf.client.send");
@@ -77,18 +79,18 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             client.send(surf_request).with_context(cx).await
         };
 
-        // let mut ures = ur.with_context(cx).await?;
 
         let body = format!(
             "upstream responded with: \n{}",
             upstream_res
-                .with_context(cx)
+                .with_context(cx.clone())
                 .await?
                 .take_body()
                 .into_string()
                 .await
                 .unwrap()
         );
+        span.add_event("upstream.request.finished".into(), vec![]);
 
         Ok(body)
     });
