@@ -62,7 +62,7 @@ use http_types::headers::{HeaderName, HeaderValue};
 use kv_log_macro as log;
 use opentelemetry::{
     global,
-    trace::{FutureExt, SpanKind, StatusCode, TraceContextExt, Tracer},
+    trace::{FutureExt, Span, SpanKind, StatusCode, TraceContextExt, Tracer},
     Context,
 };
 use opentelemetry_semantic_conventions::{resource, trace};
@@ -160,12 +160,14 @@ impl<T: Tracer + Send + Sync, State: Clone + Send + Sync + 'static> Middleware<S
         }
 
         let span = span_builder.start(&self.tracer);
+        span.add_event("request.started".to_owned(), vec![]);
         let cx = &Context::current_with_span(span);
 
         // call next in the chain
         let mut res = next.run(req).with_context(cx.clone()).await;
 
         let span = cx.span();
+        span.add_event("request.completed".to_owned(), vec![]);
 
         span.set_status(span_status(res.status()), "".to_string());
         span.set_attribute(trace::HTTP_STATUS_CODE.i64(u16::from(res.status()).into()));
@@ -188,6 +190,7 @@ impl<T: Tracer + Send + Sync, State: Clone + Send + Sync + 'static> Middleware<S
             }
         }
 
+        span.add_event("request.finished".to_owned(), vec![]);
         Ok(res)
     }
 }
