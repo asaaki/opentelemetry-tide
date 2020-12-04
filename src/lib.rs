@@ -58,15 +58,22 @@
 #![deny(unused_results)]
 #![doc(test(attr(allow(unused_variables), deny(warnings))))]
 
-use std::{convert::TryFrom, net::IpAddr, net::SocketAddr, str::FromStr};
-
+use http_types::headers::{HeaderName, HeaderValue};
+use kv_log_macro as log;
 use opentelemetry::{
+    global,
     trace::{FutureExt, SpanKind, StatusCode, TraceContextExt, Tracer},
     Context,
 };
-use opentelemetry_semantic_conventions::trace;
+use opentelemetry_semantic_conventions::{resource, trace};
+use std::collections::HashMap;
+use std::{convert::TryFrom, net::IpAddr, net::SocketAddr, str::FromStr};
 use tide::{http::Version, Middleware, Next, Request, Result};
 use url::Url;
+
+// const PKG_NAME: &str = env!("CARGO_PKG_NAME");
+const CRATE_NAME: &str = env!("CARGO_CRATE_NAME");
+const VERSION: &str = env!("CARGO_PKG_VERSION");
 
 /// The middleware struct to be used in tide
 #[derive(Default, Debug)]
@@ -95,10 +102,21 @@ impl<T: Tracer + Send + Sync, State: Clone + Send + Sync + 'static> Middleware<S
     for OpenTelemetryTracingMiddleware<T>
 {
     async fn handle(&self, req: Request<State>, next: Next<'_, State>) -> Result {
+        // gather trace data from request, used later to conditionally add remote trace info from upstream service
+        let mut req_headers = HashMap::new();
+        for (k, v) in req.iter() {
+            let _ = req_headers.insert(k.to_string(), v.last().to_string());
+        }
+        let parent_cx = global::get_text_map_propagator(|propagator| propagator.extract(&req_headers));
+        drop(req_headers);
+
         let method = req.method();
         let url = req.url().clone();
 
-        let mut attributes = Vec::with_capacity(10); // 4 required and 6 optional values
+        let mut attributes = Vec::with_capacity(13); // 7 required and 6 optional values
+        attributes.push(resource::TELEMETRY_SDK_NAME.string(CRATE_NAME));
+        attributes.push(resource::TELEMETRY_SDK_VERSION.string(VERSION));
+        attributes.push(resource::TELEMETRY_SDK_LANGUAGE.string("rust"));
         attributes.push(trace::HTTP_METHOD.string(method.to_string()));
         attributes.push(trace::HTTP_SCHEME.string(url.scheme().to_owned()));
         attributes.push(trace::HTTP_URL.string(url.to_string()));
@@ -128,16 +146,24 @@ impl<T: Tracer + Send + Sync, State: Clone + Send + Sync + 'static> Middleware<S
             attributes.push(trace::HTTP_CLIENT_IP.string(addr.to_string()));
         }
 
-        let span = self
+        let mut span_builder = self
             .tracer
             .span_builder(&format!("{} {}", method, url))
             .with_kind(SpanKind::Server)
-            .with_attributes(attributes)
-            .start(&self.tracer);
-        let cx = Context::current_with_span(span);
+            .with_attributes(attributes);
+
+        // make sure our span can be connected to a currently open/active (remote) trace if existing
+        if let Some(remote_span_ctx) = parent_cx.remote_span_context() {
+            if remote_span_ctx.is_remote() {
+                span_builder = span_builder.with_parent(remote_span_ctx.clone());
+            }
+        }
+
+        let span = span_builder.start(&self.tracer);
+        let cx = &Context::current_with_span(span);
 
         // call next in the chain
-        let res = next.run(req).with_context(cx.clone()).await;
+        let mut res = next.run(req).with_context(cx.clone()).await;
 
         let span = cx.span();
 
@@ -146,6 +172,20 @@ impl<T: Tracer + Send + Sync, State: Clone + Send + Sync + 'static> Middleware<S
 
         if let Some(len) = res.len().and_then(|len| i64::try_from(len).ok()) {
             span.set_attribute(trace::HTTP_RESPONSE_CONTENT_LENGTH.i64(len));
+        }
+
+        // write trace info to response, so it can be picked up by downstream services
+        let mut injector = HashMap::new();
+        global::get_text_map_propagator(|propagator| propagator.inject_context(&cx, &mut injector));
+
+        for (k, v) in injector {
+            let header_name = HeaderName::from_bytes(k.clone().into_bytes());
+            let header_value = HeaderValue::from_bytes(v.clone().into_bytes());
+            if let (Ok(name), Ok(value)) = (header_name, header_value) {
+                res.insert_header(name, value);
+            } else {
+                log::error!("Could not compose header for pair: ({}, {})", k, v);
+            }
         }
 
         Ok(res)
