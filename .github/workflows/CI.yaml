@@ -15,12 +15,9 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        # disabled: macos-latest
+        os: [ubuntu-latest, windows-latest]
         rust: [stable, beta]
-        exclude:
-          # it fails to often for no reason
-          - os: macos-latest
-            rust: beta
 
     steps:
     - uses: actions/checkout@v2
