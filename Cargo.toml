@@ -8,13 +8,13 @@ description = "OpenTelemetry integration for Tide"
 homepage = "https://github.com/asaaki/opentelemetry-tide"
 repository = "https://github.com/asaaki/opentelemetry-tide"
 categories = [
-  "development-tools::debugging",
-  "development-tools::profiling",
-  "asynchronous",
+  "web-programming::http-server",
   "web-programming",
   "network-programming",
+  "development-tools::debugging",
+  "development-tools::profiling",
 ]
-keywords = ["tide", "opentelemetry", "jaeger", "tracing", "instrumentation"]
+keywords = ["tide", "opentelemetry", "jaeger", "tracing", "instrumentation", "async", "http", "server", "middleware"]
 license = "MIT OR Apache-2.0"
 exclude = [".assets/*", ".github/*"]
 
