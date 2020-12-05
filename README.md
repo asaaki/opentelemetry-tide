@@ -105,6 +105,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 
 
+## Cargo Features:
+
+## Safety
+
+This crate uses ``#![forbid(unsafe_code)]`` to ensure everything is implemented in
+100% Safe Rust.
+
 ## License
 
 <sup>
