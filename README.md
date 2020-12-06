@@ -1,4 +1,4 @@
-<h1 align="center">🔭🌊<br>opentelemetry-tide</h1>
+<h1 align="center"><img src="https://raw.githubusercontent.com/asaaki/opentelemetry-tide/main/.assets/opentelemetry-tide-logo.svg" width=128 height=128><br>opentelemetry-tide</h1>
 <div align="center"><strong>
 
 [OpenTelemetry][otel] integration for [Tide][tide]
