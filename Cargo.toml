@@ -14,7 +14,7 @@ categories = [
   "development-tools::debugging",
   "development-tools::profiling",
 ]
-keywords = ["tide", "opentelemetry", "jaeger", "tracing", "instrumentation", "async", "http", "server", "middleware"]
+keywords = ["tide", "opentelemetry", "jaeger", "tracing", "instrumentation"]
 license = "MIT OR Apache-2.0"
 exclude = [".assets/*", ".github/*"]
 
@@ -23,7 +23,7 @@ opentelemetry = "0.10"
 opentelemetry-semantic-conventions = "0.2"
 tide = "0.15"
 url = "2.2"
-http-types = "2.8"
+http-types = "2.9"
 kv-log-macro = "1.0"
 
 [dev-dependencies]
