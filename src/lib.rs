@@ -56,7 +56,10 @@
 #![warn(clippy::expect_used)]
 #![deny(clippy::unwrap_used)]
 #![deny(unused_results)]
-#![doc(test(attr(allow(unused_variables), deny(warnings))))]
+#![doc(
+    test(attr(allow(unused_variables), deny(warnings))),
+    html_logo_url = "https://raw.githubusercontent.com/asaaki/opentelemetry-tide/main/.assets/opentelemetry-tide-logo.svg"
+)]
 
 use http_types::headers::{HeaderName, HeaderValue};
 use kv_log_macro as log;
