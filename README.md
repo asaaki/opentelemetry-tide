@@ -1,4 +1,4 @@
-<h1 align="center">opentelemetry-tide</h1>
+<h1 align="center">🔭🌊<br>opentelemetry-tide</h1>
 <div align="center"><strong>
 
 [OpenTelemetry][otel] integration for [Tide][tide]
@@ -43,7 +43,9 @@
 
 ```sh
 # Run jaeger in background
-docker run -d -p6831:6831/udp -p6832:6832/udp -p16686:16686 jaegertracing/all-in-one:latest
+docker run -d \
+  -p6831:6831/udp -p6832:6832/udp -p16686:16686 -p14268:14268 \
+  jaegertracing/all-in-one:latest
 
 # Run server example with tracing middleware
 cargo run --example server
@@ -55,7 +57,7 @@ curl http://localhost:3000/
 firefox http://localhost:16686/
 ```
 
-![example jaeger trace](https://github.com/asaaki/opentelemetry-tide/blob/main/.assets/jaeger-trace.png)
+![example jaeger trace](https://raw.githubusercontent.com/asaaki/opentelemetry-tide/main/.assets/jaeger-trace.png)
 
 ### Code example
 
