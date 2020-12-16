@@ -4,7 +4,7 @@ use std::io::Write;
 use std::path::Path;
 
 fn generate_build_vars(output_path: &Path) {
-    let profile = env::var("PROFILE").unwrap();
+    let profile = env::var("PROFILE").unwrap_or_else(|_| "unknown".to_string());
     let mut f = File::create(&output_path.join("build_vars.rs")).expect("Could not create user build_vars.rs file");
     f.write_all(format!("static PROFILE: &str = \"{}\";", profile).as_bytes())
         .expect("Unable to write user agent");
