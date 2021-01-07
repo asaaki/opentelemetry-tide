@@ -30,14 +30,14 @@
 //!
 //!     let tags = [resource::SERVICE_VERSION.string(VERSION)];
 //!
-//!     let (tracer, _uninstall) = opentelemetry_jaeger::new_pipeline()
+//!     let (tracer, uninstall) = opentelemetry_jaeger::new_pipeline()
 //!         .with_service_name("example-server")
 //!         .with_tags(tags.iter().map(ToOwned::to_owned))
 //!         .install()
 //!         .expect("pipeline install failure");
 //!
 //!     let mut app = tide::new();
-//!     app.with(OpenTelemetryTracingMiddleware::new(tracer));
+//!     app.with(OpenTelemetryTracingMiddleware::new(tracer, uninstall));
 //!     app.at("/").get(|req: Request<()>| async move {
 //!         eprintln!("req.version = {:?}", req.version());
 //!         Ok("Hello, OpenTelemetry!")
@@ -80,29 +80,30 @@ const VERSION: &str = env!("CARGO_PKG_VERSION");
 
 /// The middleware struct to be used in tide
 #[derive(Default, Debug)]
-pub struct OpenTelemetryTracingMiddleware<T: Tracer> {
+pub struct OpenTelemetryTracingMiddleware<T: Tracer, U> {
     tracer: T,
+    uninstall: U,
 }
 
-impl<T: Tracer> OpenTelemetryTracingMiddleware<T> {
+impl<T: Tracer, U> OpenTelemetryTracingMiddleware<T, U> {
     /// Instantiate the middleware
     ///
     /// # Examples
     ///
     /// ```rust,no_run
     /// let mut app = tide::new();
-    /// let (tracer, _uninstall) = opentelemetry_jaeger::new_pipeline().install().unwrap();
-    /// app.with(opentelemetry_tide::OpenTelemetryTracingMiddleware::new(tracer));
+    /// let (tracer, uninstall) = opentelemetry_jaeger::new_pipeline().install().unwrap();
+    /// app.with(opentelemetry_tide::OpenTelemetryTracingMiddleware::new(tracer, uninstall));
     /// app.at("/").get(|_| async { Ok("Traced!") });
     /// ```
-    pub fn new(tracer: T) -> Self {
-        Self { tracer }
+    pub fn new(tracer: T, uninstall: U) -> Self {
+        Self { tracer, uninstall }
     }
 }
 
 #[tide::utils::async_trait]
-impl<T: Tracer + Send + Sync, State: Clone + Send + Sync + 'static> Middleware<State>
-    for OpenTelemetryTracingMiddleware<T>
+impl<T: Tracer + Send + Sync, State: Clone + Send + Sync + 'static, U: Send + Sync + 'static> Middleware<State>
+    for OpenTelemetryTracingMiddleware<T, U>
 {
     async fn handle(&self, req: Request<State>, next: Next<'_, State>) -> Result {
         // gather trace data from request, used later to conditionally add remote trace info from upstream service

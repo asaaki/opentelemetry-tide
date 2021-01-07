@@ -30,14 +30,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         resource::PROCESS_PID.string(std::process::id().to_string()),
     ];
 
-    let (tracer, _uninstall) = opentelemetry_jaeger::new_pipeline()
+    let (tracer, uninstall) = opentelemetry_jaeger::new_pipeline()
         .with_service_name(SVC_NAME)
         .with_tags(tags.iter().map(ToOwned::to_owned))
         .install()
         .expect("pipeline install failure");
 
     let mut app = tide::new();
-    app.with(OpenTelemetryTracingMiddleware::new(tracer));
+    app.with(OpenTelemetryTracingMiddleware::new(tracer, uninstall));
     app.at("/").get(|_| async move { Ok("Hello, OpenTelemetry!") });
     app.listen("127.0.0.1:3000").await?;
 
