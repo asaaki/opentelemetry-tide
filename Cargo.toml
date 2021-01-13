@@ -1,6 +1,6 @@
 [package]
 name = "opentelemetry-tide"
-version = "0.5.2"
+version = "0.6.0"
 authors = ["Christoph Grabo <asaaki@mannaz.cc>"]
 edition = "2018"
 readme = "README.md"

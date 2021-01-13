@@ -68,7 +68,7 @@ firefox http://localhost:16686/
 async-std = { version = "1.8", features = ["attributes"] }
 opentelemetry = { version = "0.11", features = ["async-std"] }
 opentelemetry-jaeger = { version = "0.10", features = ["async-std"] }
-opentelemetry-tide = "0.5"
+opentelemetry-tide = "0.6"
 tide = "0.15"
 ```
 
