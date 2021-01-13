@@ -1,7 +1,5 @@
 use opentelemetry::global;
-use opentelemetry::sdk::propagation::{
-    BaggagePropagator, TextMapCompositePropagator, TraceContextPropagator,
-};
+use opentelemetry::sdk::propagation::{BaggagePropagator, TextMapCompositePropagator, TraceContextPropagator};
 use opentelemetry_jaeger::Propagator as JaegerPropagator;
 
 pub fn init_global_propagator() {
