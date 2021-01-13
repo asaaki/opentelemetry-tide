@@ -1,7 +1,8 @@
 use opentelemetry::global;
 use opentelemetry::sdk::propagation::{
-    B3Encoding, B3Propagator, BaggagePropagator, JaegerPropagator, TextMapCompositePropagator, TraceContextPropagator,
+    BaggagePropagator, TextMapCompositePropagator, TraceContextPropagator,
 };
+use opentelemetry_jaeger::Propagator as JaegerPropagator;
 
 pub fn init_global_propagator() {
     global::set_text_map_propagator(composite_propagator());
@@ -10,9 +11,6 @@ pub fn init_global_propagator() {
 }
 
 fn composite_propagator() -> TextMapCompositePropagator {
-    // the good old zipkin format - probably useful for zipkin environments only
-    let b3_propagator = B3Propagator::with_encoding(B3Encoding::SingleAndMultiHeader);
-
     // W3C spec: https://w3c.github.io/baggage/ - very flexible KV format, can carry more than just trace context data
     let baggage_propagator = BaggagePropagator::new();
 
@@ -27,7 +25,6 @@ fn composite_propagator() -> TextMapCompositePropagator {
     // of course, if you send all headers with identical values the order doesn't matter.
     TextMapCompositePropagator::new(vec![
         Box::new(jaeger_propagator),
-        Box::new(b3_propagator),
         Box::new(baggage_propagator),
         Box::new(trace_context_propagator),
     ])

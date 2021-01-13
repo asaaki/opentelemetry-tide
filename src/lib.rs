@@ -159,7 +159,7 @@ impl<T: Tracer + Send + Sync, State: Clone + Send + Sync + 'static, U: Send + Sy
         // make sure our span can be connected to a currently open/active (remote) trace if existing
         if let Some(remote_span_ctx) = parent_cx.remote_span_context() {
             if remote_span_ctx.is_remote() {
-                span_builder = span_builder.with_parent(remote_span_ctx.clone());
+                span_builder = span_builder.with_parent_context(parent_cx.clone());
             }
         }
 

@@ -19,15 +19,15 @@ license = "MIT OR Apache-2.0"
 exclude = [".assets/*", ".github/*"]
 
 [dependencies]
-opentelemetry = "0.10"
-opentelemetry-semantic-conventions = "0.2"
+opentelemetry = "0.11"
+opentelemetry-semantic-conventions = "0.3"
 tide = "0.15"
 url = "2.2"
 http-types = "2.9"
 kv-log-macro = "1.0"
 
 [dev-dependencies]
-async-std = { version = "1.7", features = ["attributes"] }
-opentelemetry = { version = "0.10", features = ["async-std"] }
-opentelemetry-jaeger = { version = "0.9", features = ["async-std"] }
+async-std = { version = "1.8", features = ["attributes"] }
+opentelemetry = { version = "0.11", features = ["async-std"] }
+opentelemetry-jaeger = { version = "0.10", features = ["async-std"] }
 surf = "2.1"
