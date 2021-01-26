@@ -11,6 +11,17 @@ Additional changes to original format:
 
 ## [Unreleased]
 
+## [0.6.1] - 2021-01-26
+### Added
+- Dependabot v2 configuration
+
+### Changed
+- Update dependencies (#3)
+- Include "The opentelemetry-tide Contributors" in the authors list of the crate
+
+### Thank you for your contribution
+- [@fiag][fiag]
+
 ## [0.6.0] - 2021-01-13
 ### Added
 - Changelog with basic historical summaries
@@ -58,7 +69,8 @@ _(not released to crates.io)_
 ## [0.1.0] - 2020-08-01
 **Initial release**
 
-[Unreleased]: https://github.com/asaaki/opentelemetry-tide/compare/v0.6.0...HEAD
+[Unreleased]: https://github.com/asaaki/opentelemetry-tide/compare/v0.6.1...HEAD
+[0.6.1]: https://github.com/asaaki/opentelemetry-tide/compare/v0.6.0...v0.6.1
 [0.6.0]: https://github.com/asaaki/opentelemetry-tide/compare/v0.5.2...v0.6.0
 [0.5.2]: https://github.com/asaaki/opentelemetry-tide/compare/v0.5.0...v0.5.2
 [0.5.0]: https://github.com/asaaki/opentelemetry-tide/compare/v0.3.1...v0.5.0

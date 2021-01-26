@@ -65,9 +65,9 @@ firefox http://localhost:16686/
 
 ```toml
 [dependencies]
-async-std = { version = "1.8", features = ["attributes"] }
-opentelemetry = { version = "0.11", features = ["async-std"] }
-opentelemetry-jaeger = { version = "0.10", features = ["async-std"] }
+async-std = {version =  "1.9", features = ["attributes"]}
+opentelemetry = { version = "0.12", features = ["async-std"] }
+opentelemetry-jaeger = { version = "0.11", features = ["async-std"] }
 opentelemetry-tide = "0.6"
 tide = "0.15"
 ```
