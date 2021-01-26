@@ -1,7 +1,10 @@
 [package]
 name = "opentelemetry-tide"
 version = "0.6.0"
-authors = ["Christoph Grabo <asaaki@mannaz.cc>"]
+authors = [
+  "Christoph Grabo <asaaki@mannaz.cc>",
+  "The opentelemetry-tide Contributors"
+]
 edition = "2018"
 readme = "README.md"
 description = "OpenTelemetry integration for Tide"
