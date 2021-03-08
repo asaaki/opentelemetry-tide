@@ -29,22 +29,9 @@ jobs:
 
     - uses: Swatinem/rust-cache@v1
 
-    - name: Run cargo fetch
-      uses: actions-rs/cargo@v1
-      with:
-        command: fetch
-
-    - name: Run cargo check
-      uses: actions-rs/cargo@v1
-      with:
-        command: check
-        args: --all --examples
-
-    - name: Run tests
-      uses: actions-rs/cargo@v1
-      with:
-        command: test
-        args: --all
+    - run: cargo fetch
+    - run: cargo check --all --examples
+    - run: cargo test --all
 
   check_fmt_and_docs:
     name: Checking fmt, clippy, and docs
