@@ -1,4 +1,4 @@
-name: CI
+name: Continuous Integration
 
 on:
   push:
@@ -17,7 +17,6 @@ jobs:
       matrix:
         os: [ubuntu-20.04, windows-latest]
         rust: [stable, beta]
-        cache_counter: [1]
 
     steps:
     - uses: actions/checkout@v2
@@ -28,16 +27,9 @@ jobs:
         profile: minimal
         override: true
 
-    - name: Caching
-      uses: actions/cache@v2
+    - uses: Swatinem/rust-cache@v1
       with:
-        path: |
-          ~/.cargo/registry
-          ~/.cargo/git
-          target
-        key: ${{ runner.os }}-${{ matrix.rust }}-cargo-${{ matrix.cache_counter }}-${{ hashFiles('**/Cargo.toml', '**/src/lib.rs') }}
-        restore-keys: |
-          ${{ runner.os }}-${{ matrix.rust }}-cargo-${{ matrix.cache_counter }}-
+        working-directory: rust
 
     - name: Run cargo fetch
       uses: actions-rs/cargo@v1
@@ -58,9 +50,10 @@ jobs:
 
   check_fmt_and_docs:
     name: Checking fmt, clippy, and docs
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
+
     steps:
-    - uses: actions/checkout@master
+    - uses: actions/checkout@v2
 
     - uses: actions-rs/toolchain@v1
       with:
@@ -68,45 +61,11 @@ jobs:
         override: true
         components: rustfmt, clippy
 
-    - name: Caching
-      uses: actions/cache@v2
+    - uses: Swatinem/rust-cache@v1
       with:
-        path: |
-          ~/.cargo/registry
-          ~/.cargo/git
-          target
-        key: ${{ runner.os }}-lint-${{ hashFiles('**/Cargo.toml', '**/src/lib.rs') }}
-        restore-keys: |
-          ${{ runner.os }}-lint-
+        working-directory: rust
 
-    - name: Run cargo fetch
-      uses: actions-rs/cargo@v1
-      with:
-        command: fetch
-
-    - name: Run cargo generate-lockfile
-      uses: actions-rs/cargo@v1
-      with:
-        command: generate-lockfile
-
-    - uses: actions-rs/audit-check@v1
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-
-    - name: clippy
-      uses: actions-rs/cargo@v1
-      with:
-        command: clippy
-        args: --tests --examples -- -D warnings
-
-    - name: fmt
-      uses: actions-rs/cargo@v1
-      with:
-        command: fmt
-        args: --all -- --check
-
-    - name: Docs
-      uses: actions-rs/cargo@v1
-      with:
-        command: doc
-        args: --no-deps
+    - run: cargo check
+    - run: cargo clippy --tests --examples -- -D warnings
+    - run: cargo fmt --all -- --check
+    - run: cargo doc --no-deps
