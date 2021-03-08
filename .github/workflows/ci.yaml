@@ -28,8 +28,6 @@ jobs:
         override: true
 
     - uses: Swatinem/rust-cache@v1
-      with:
-        working-directory: rust
 
     - name: Run cargo fetch
       uses: actions-rs/cargo@v1
@@ -62,8 +60,6 @@ jobs:
         components: rustfmt, clippy
 
     - uses: Swatinem/rust-cache@v1
-      with:
-        working-directory: rust
 
     - run: cargo check
     - run: cargo clippy --tests --examples -- -D warnings
