@@ -1,6 +1,17 @@
-use opentelemetry::global;
-use opentelemetry::sdk::propagation::{BaggagePropagator, TextMapCompositePropagator, TraceContextPropagator};
+#![doc(hidden)]
+#![allow(unused_imports)]
+
+use std::any::Any;
+
+use opentelemetry::sdk::{
+    propagation::{BaggagePropagator, TextMapCompositePropagator, TraceContextPropagator},
+    trace::{self, Config, Sampler, Tracer},
+};
+use opentelemetry::{global, trace::TraceError, KeyValue};
 use opentelemetry_jaeger::Propagator as JaegerPropagator;
+use opentelemetry_semantic_conventions::resource;
+
+include!(concat!(env!("OUT_DIR"), "/build_vars.rs"));
 
 pub fn init_global_propagator() {
     global::set_text_map_propagator(composite_propagator());
@@ -28,6 +39,24 @@ fn composite_propagator() -> TextMapCompositePropagator {
     ])
 }
 
-// make rust (analyzer) happy
 #[allow(dead_code)]
-fn main() {}
+pub fn trace_config() -> Config {
+    trace::config()
+    // can accept more options like:
+    // .with_sampler(Sampler::TraceIdRatioBased(0.2))
+}
+
+pub fn jaeger_tracer(svc_name: &str, version: &str, instance_id: &str) -> Result<Tracer, TraceError> {
+    let tags = [
+        resource::SERVICE_VERSION.string(version.to_owned()),
+        resource::SERVICE_INSTANCE_ID.string(instance_id.to_owned()),
+        resource::PROCESS_EXECUTABLE_PATH.string(std::env::current_exe().unwrap().display().to_string()),
+        resource::PROCESS_PID.string(std::process::id().to_string()),
+        KeyValue::new("process.executable.profile", PROFILE),
+    ];
+
+    opentelemetry_jaeger::new_pipeline()
+        .with_service_name(svc_name)
+        .with_tags(tags.iter().map(ToOwned::to_owned))
+        .install_batch(opentelemetry::runtime::AsyncStd)
+}

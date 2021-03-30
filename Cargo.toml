@@ -1,6 +1,6 @@
 [package]
 name = "opentelemetry-tide"
-version = "0.6.2"
+version = "0.7.0-dev"
 authors = [
   "Christoph Grabo <asaaki@mannaz.cc>",
   "The opentelemetry-tide Contributors"
@@ -21,9 +21,20 @@ keywords = ["tide", "opentelemetry", "jaeger", "tracing", "instrumentation"]
 license = "MIT OR Apache-2.0"
 exclude = [".assets/*", ".github/*"]
 
+[lib]
+doctest = false
+
+[[example]]
+name = "server"
+path = "examples/servers/server.rs"
+
+[[example]]
+name = "front-server"
+path = "examples/servers/front-server.rs"
+
 [dependencies]
-opentelemetry = "0.12"
-opentelemetry-semantic-conventions = "0.4"
+opentelemetry = "0.13"
+opentelemetry-semantic-conventions = "0.5"
 tide = "0.16"
 url = "2.2"
 http-types = "2.10"
@@ -31,6 +42,6 @@ kv-log-macro = "1.0"
 
 [dev-dependencies]
 async-std = { version = "1.9", features = ["attributes"] }
-opentelemetry = { version = "0.12", features = ["async-std"] }
-opentelemetry-jaeger = { version = "0.11", features = ["async-std"] }
-surf = "2.1"
+opentelemetry = { version = "0.13", features = ["async-std", "rt-async-std"] }
+opentelemetry-jaeger = { version = "0.12", features = ["async-std"] }
+surf = "2.2"

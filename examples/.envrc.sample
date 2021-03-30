@@ -1,0 +1,10 @@
+# https://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/sdk-environment-variables.md
+
+# in ms; default: 5000
+export OTEL_BSP_SCHEDULE_DELAY=100
+
+# default: 2048; 1048576, 2097152, 134217728
+export OTEL_BSP_MAX_QUEUE_SIZE=134217728
+
+# default: 512; must be kept very low to fit into a 65,000 bytes UDP packet
+export OTEL_BSP_MAX_EXPORT_BATCH_SIZE=64

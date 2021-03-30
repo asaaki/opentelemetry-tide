@@ -10,6 +10,16 @@ Additional changes to original format:
 - `Thank you for your contribution` for shout-outs to the community
 
 ## [Unreleased]
+### Changed
+- Update dependencies and adapt code accordingly
+
+  This is a breaking change!
+  Most notably: The "uninstall" guard is gone; see examples for how to do it with current otel crates.
+
+### Cosmetic
+- "Fix" the issue with examples' shared module
+- Improve the example code (move more setup and config to shared module)
+- Adds k6.io script and .envrc sample for load testing purposes
 
 ## [0.6.2] - 2021-03-08
 ### Changed
