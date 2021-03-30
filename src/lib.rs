@@ -9,10 +9,10 @@
 //! ```toml
 //! [dependencies]
 //! async-std = {version =  "1.9", features = ["attributes"]}
-//! opentelemetry = { version = "0.12", features = ["async-std"] }
-//! opentelemetry-jaeger = { version = "0.11", features = ["async-std"] }
-//! opentelemetry-tide = "0.6"
-//! tide = "0.15"
+//! opentelemetry = { version = "0.13", features = ["rt-async-std"] }
+//! opentelemetry-jaeger = { version = "0.12", features = ["async-std"] }
+//! opentelemetry-tide = "0.7"
+//! tide = "0.16"
 //! ```
 //!
 //! ## `server.rs`
@@ -30,14 +30,14 @@
 //!
 //!     let tags = [resource::SERVICE_VERSION.string(VERSION)];
 //!
-//!     let (tracer, uninstall) = opentelemetry_jaeger::new_pipeline()
+//!     let tracer = opentelemetry_jaeger::new_pipeline()
 //!         .with_service_name("example-server")
 //!         .with_tags(tags.iter().map(ToOwned::to_owned))
-//!         .install()
+//!         .install_batch(opentelemetry::runtime::AsyncStd)
 //!         .expect("pipeline install failure");
 //!
 //!     let mut app = tide::new();
-//!     app.with(OpenTelemetryTracingMiddleware::new(tracer, uninstall));
+//!     app.with(OpenTelemetryTracingMiddleware::new(tracer));
 //!     app.at("/").get(|req: Request<()>| async move {
 //!         eprintln!("req.version = {:?}", req.version());
 //!         Ok("Hello, OpenTelemetry!")
@@ -80,30 +80,29 @@ const VERSION: &str = env!("CARGO_PKG_VERSION");
 
 /// The middleware struct to be used in tide
 #[derive(Default, Debug)]
-pub struct OpenTelemetryTracingMiddleware<T: Tracer, U> {
+pub struct OpenTelemetryTracingMiddleware<T: Tracer> {
     tracer: T,
-    uninstall: U,
 }
 
-impl<T: Tracer, U> OpenTelemetryTracingMiddleware<T, U> {
+impl<T: Tracer> OpenTelemetryTracingMiddleware<T> {
     /// Instantiate the middleware
     ///
     /// # Examples
     ///
     /// ```rust,no_run
     /// let mut app = tide::new();
-    /// let (tracer, uninstall) = opentelemetry_jaeger::new_pipeline().install().unwrap();
-    /// app.with(opentelemetry_tide::OpenTelemetryTracingMiddleware::new(tracer, uninstall));
+    /// let tracer = opentelemetry_jaeger::new_pipeline().install_simple().unwrap();
+    /// app.with(opentelemetry_tide::OpenTelemetryTracingMiddleware::new(tracer));
     /// app.at("/").get(|_| async { Ok("Traced!") });
     /// ```
-    pub fn new(tracer: T, uninstall: U) -> Self {
-        Self { tracer, uninstall }
+    pub fn new(tracer: T) -> Self {
+        Self { tracer }
     }
 }
 
 #[tide::utils::async_trait]
-impl<T: Tracer + Send + Sync, State: Clone + Send + Sync + 'static, U: Send + Sync + 'static> Middleware<State>
-    for OpenTelemetryTracingMiddleware<T, U>
+impl<T: Tracer + Send + Sync, State: Clone + Send + Sync + 'static> Middleware<State>
+    for OpenTelemetryTracingMiddleware<T>
 {
     async fn handle(&self, req: Request<State>, next: Next<'_, State>) -> Result {
         // gather trace data from request, used later to conditionally add remote trace info from upstream service

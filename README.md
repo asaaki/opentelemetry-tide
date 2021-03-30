@@ -66,10 +66,10 @@ firefox http://localhost:16686/
 ```toml
 [dependencies]
 async-std = {version =  "1.9", features = ["attributes"]}
-opentelemetry = { version = "0.12", features = ["async-std"] }
-opentelemetry-jaeger = { version = "0.11", features = ["async-std"] }
-opentelemetry-tide = "0.6"
-tide = "0.15"
+opentelemetry = { version = "0.13", features = ["rt-async-std"] }
+opentelemetry-jaeger = { version = "0.12", features = ["async-std"] }
+opentelemetry-tide = "0.7"
+tide = "0.16"
 ```
 
 #### `server.rs`
@@ -89,10 +89,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let tags = [resource::SERVICE_VERSION.string(VERSION)];
 
-    let (tracer, _uninstall) = opentelemetry_jaeger::new_pipeline()
+    let tracer = opentelemetry_jaeger::new_pipeline()
         .with_service_name("example-server")
         .with_tags(tags.iter().map(ToOwned::to_owned))
-        .install()
+        .install_batch(opentelemetry::runtime::AsyncStd)
         .expect("pipeline install failure");
 
     let mut app = tide::new();

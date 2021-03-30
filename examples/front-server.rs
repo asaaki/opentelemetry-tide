@@ -42,14 +42,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         KeyValue::new("process.executable.profile", PROFILE),
     ];
 
-    let (tracer, uninstall) = opentelemetry_jaeger::new_pipeline()
+    let tracer = opentelemetry_jaeger::new_pipeline()
         .with_service_name(SVC_NAME)
         .with_tags(tags.iter().map(ToOwned::to_owned))
-        .install()
+        .install_batch(opentelemetry::runtime::AsyncStd)
         .expect("pipeline install failure");
 
     let mut app = tide::with_state(surf::client());
-    app.with(OpenTelemetryTracingMiddleware::new(tracer, uninstall));
+    app.with(OpenTelemetryTracingMiddleware::new(tracer));
 
     app.at("/").get(|req: Request<surf::Client>| async move {
         // collect current tracing data, so we can pass it down
