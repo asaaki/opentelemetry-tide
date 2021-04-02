@@ -129,7 +129,7 @@ impl<State: Clone + Send + Sync + 'static> Middleware<State> for OpenTelemetryMe
 
             let elapsed = timer.elapsed();
             let elapsed_sec = elapsed.clone().map(|t| t.as_secs_f64()).unwrap_or_default();
-            let elapsed_ms = elapsed.map(|t| t.as_secs_f64() / 1_000f64).unwrap_or_default();
+            let elapsed_ms = elapsed.map(|t| t.as_secs_f64() * 1_000f64).unwrap_or_default();
 
             labels.push(STATUS_KEY.i64(u16::from(res.status()).into()));
 
