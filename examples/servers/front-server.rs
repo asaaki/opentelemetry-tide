@@ -17,7 +17,7 @@ use opentelemetry::{
     trace::{FutureExt, TraceContextExt, Tracer},
     Context,
 };
-use opentelemetry_tide::OpenTelemetryTracingMiddleware;
+use opentelemetry_tide::TideExt;
 use std::collections::HashMap;
 use tide::Request;
 
@@ -36,7 +36,7 @@ async fn main() -> MainResult {
     let tracer = shared::jaeger_tracer(SVC_NAME, VERSION, "frontend-753")?;
 
     let mut app = tide::with_state(surf::client());
-    app.with(OpenTelemetryTracingMiddleware::new(tracer));
+    app.with_middlewares(tracer, None);
 
     app.at("/").get(|req: Request<surf::Client>| async move {
         // collect current tracing data, so we can pass it down

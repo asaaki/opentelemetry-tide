@@ -10,7 +10,7 @@
 //! curl 'http://127.0.0.1:3000/' -H 'traceparent: 00-00110022003300440055006600770088-0011223344556677-01' -i
 //! ```
 
-use opentelemetry_tide::OpenTelemetryTracingMiddleware;
+use opentelemetry_tide::TideExt;
 
 mod shared;
 
@@ -26,7 +26,7 @@ async fn main() -> MainResult {
     let tracer = shared::jaeger_tracer(SVC_NAME, VERSION, "backend-123")?;
 
     let mut app = tide::new();
-    app.with(OpenTelemetryTracingMiddleware::new(tracer));
+    app.with_middlewares(tracer, None);
     app.at("/").get(|_| async move { Ok("Hello, OpenTelemetry!") });
 
     app.listen("0.0.0.0:3000").await?;
