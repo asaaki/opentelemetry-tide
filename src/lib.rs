@@ -59,7 +59,8 @@
 #![deny(unused_results)]
 #![doc(
     test(attr(allow(unused_variables), deny(warnings))),
-    html_logo_url = "https://raw.githubusercontent.com/asaaki/opentelemetry-tide/main/.assets/opentelemetry-tide-logo.svg"
+    html_favicon_url = "https://raw.githubusercontent.com/asaaki/opentelemetry-tide/main/.assets/favicon.ico",
+    html_logo_url = "https://raw.githubusercontent.com/asaaki/opentelemetry-tide/main/.assets/docs.png"
 )]
 
 // const PKG_NAME: &str = env!("CARGO_PKG_NAME");
