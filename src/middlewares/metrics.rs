@@ -26,6 +26,7 @@ pub struct OpenTelemetryMetricsMiddleware {
     request_count: Counter<u64>,
     error_count: Counter<u64>,
     duration: ValueRecorder<f64>,
+    duration_ms: ValueRecorder<f64>,
 }
 
 fn init_meter(custom_kvs: Option<Vec<KeyValue>>) -> PrometheusExporter {
@@ -69,7 +70,13 @@ impl OpenTelemetryMetricsMiddleware {
         let duration = meter
             .f64_value_recorder("http_server_request_duration_seconds")
             .with_unit(Unit::new("seconds"))
-            .with_description("request duration histogram (since start of service)")
+            .with_description("request duration histogram (in seconds, since start of service)")
+            .init();
+
+        let duration_ms = meter
+            .f64_value_recorder("http_server_request_duration_ms")
+            .with_unit(Unit::new("milliseconds"))
+            .with_description("request duration histogram (in milliseconds, since start of service)")
             .init();
 
         Self {
@@ -77,6 +84,7 @@ impl OpenTelemetryMetricsMiddleware {
             request_count,
             error_count,
             duration,
+            duration_ms
         }
     }
 }
@@ -105,7 +113,9 @@ impl<State: Clone + Send + Sync + 'static> Middleware<State> for OpenTelemetryMe
             // call next in the chain
             let res = next.run(req).await;
 
-            let elapsed = timer.elapsed().map(|t| t.as_secs_f64()).unwrap_or_default();
+            let elapsed = timer.elapsed();
+            let elapsed_sec = elapsed.clone().map(|t| t.as_secs_f64()).unwrap_or_default();
+            let elapsed_ms = elapsed.map(|t| t.as_secs_f64() / 1_000f64).unwrap_or_default();
 
             labels.push(STATUS_KEY.i64(u16::from(res.status()).into()));
 
@@ -113,7 +123,8 @@ impl<State: Clone + Send + Sync + 'static> Middleware<State> for OpenTelemetryMe
                 self.error_count.add(1, &labels)
             }
             self.request_count.add(1, &labels);
-            self.duration.record(elapsed, &labels);
+            self.duration.record(elapsed_sec, &labels);
+            self.duration_ms.record(elapsed_ms, &labels);
             Ok(res)
         }
     }
