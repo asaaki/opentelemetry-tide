@@ -127,7 +127,7 @@ pub trait TideExt<S> {
     See [OpenTelemetryTracingMiddleware::new] for details.
     */
     #[cfg(feature = "trace")]
-    fn with_tracing_middleware<T>(self: &mut Self, tracer: T) -> &mut Self
+    fn with_tracing_middleware<T>(&mut self, tracer: T) -> &mut Self
     where
         T: Tracer + Send + Sync,
         S: Clone + Send + Sync + 'static;
@@ -138,7 +138,7 @@ pub trait TideExt<S> {
     See [OpenTelemetryMetricsMiddleware::new] for details.
     */
     #[cfg(feature = "metrics")]
-    fn with_metrics_middleware(self: &mut Self, custom_kvs: Option<Vec<KeyValue>>) -> &mut Self
+    fn with_metrics_middleware(&mut self, custom_kvs: Option<Vec<KeyValue>>) -> &mut Self
     where
         S: Clone + Send + Sync + 'static;
 
@@ -148,7 +148,7 @@ pub trait TideExt<S> {
     See [OpenTelemetryTracingMiddleware::new] and [OpenTelemetryMetricsMiddleware::new] for details.
     */
     #[cfg(all(feature = "trace", feature = "metrics"))]
-    fn with_middlewares<T>(self: &mut Self, tracer: T, custom_kvs: Option<Vec<KeyValue>>) -> &mut Self
+    fn with_middlewares<T>(&mut self, tracer: T, custom_kvs: Option<Vec<KeyValue>>) -> &mut Self
     where
         T: Tracer + Send + Sync,
         S: Clone + Send + Sync + 'static;
@@ -156,7 +156,7 @@ pub trait TideExt<S> {
 
 impl<S> TideExt<S> for tide::Server<S> {
     #[cfg(feature = "trace")]
-    fn with_tracing_middleware<T>(self: &mut Self, tracer: T) -> &mut Self
+    fn with_tracing_middleware<T>(&mut self, tracer: T) -> &mut Self
     where
         T: Tracer + Send + Sync,
         S: Clone + Send + Sync + 'static,
@@ -165,7 +165,7 @@ impl<S> TideExt<S> for tide::Server<S> {
     }
 
     #[cfg(feature = "metrics")]
-    fn with_metrics_middleware(self: &mut Self, custom_kvs: Option<Vec<KeyValue>>) -> &mut Self
+    fn with_metrics_middleware(&mut self, custom_kvs: Option<Vec<KeyValue>>) -> &mut Self
     where
         S: Clone + Send + Sync + 'static,
     {
@@ -173,7 +173,7 @@ impl<S> TideExt<S> for tide::Server<S> {
     }
 
     #[cfg(all(feature = "trace", feature = "metrics"))]
-    fn with_middlewares<T>(self: &mut Self, tracer: T, custom_kvs: Option<Vec<KeyValue>>) -> &mut Self
+    fn with_middlewares<T>(&mut self, tracer: T, custom_kvs: Option<Vec<KeyValue>>) -> &mut Self
     where
         T: Tracer + Send + Sync,
         S: Clone + Send + Sync + 'static,
