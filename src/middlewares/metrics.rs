@@ -25,7 +25,6 @@ const HISTOGRAM_BOUNDARIES: [f64; 15] = [
     50.000, 100.000, 500.000,
     1000.000
 ];
-const SUMMARY_QUANTILES: [f64; 6] = [0.50, 0.75, 0.90, 0.95, 0.99, 0.999];
 
 /// The middleware struct to be used in tide
 #[derive(Debug)]
@@ -41,13 +40,11 @@ fn init_meter(custom_kvs: Option<Vec<KeyValue>>) -> PrometheusExporter {
     if let Some(kvs) = custom_kvs {
         opentelemetry_prometheus::exporter()
             .with_default_histogram_boundaries(HISTOGRAM_BOUNDARIES.to_vec())
-            .with_default_summary_quantiles(SUMMARY_QUANTILES.to_vec())
             .with_resource(Resource::new(kvs))
             .init()
     } else {
         opentelemetry_prometheus::exporter()
             .with_default_histogram_boundaries(HISTOGRAM_BOUNDARIES.to_vec())
-            .with_default_summary_quantiles(SUMMARY_QUANTILES.to_vec())
             .init()
     }
 }
