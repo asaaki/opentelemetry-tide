@@ -74,3 +74,67 @@ pub use middlewares::tracing::OpenTelemetryTracingMiddleware;
 
 #[cfg(feature = "metrics")]
 pub use middlewares::metrics::OpenTelemetryMetricsMiddleware;
+
+/// this extension trait provides convenience methods for attaching middlewares of this crate
+pub trait TideExt<S> {
+    /**
+    Attaches tracing middleware with provided tracer.
+
+    See [OpenTelemetryTracingMiddleware::new] for details.
+    */
+    #[cfg(feature = "trace")]
+    fn with_tracing_middleware<T>(self: &mut Self, tracer: T) -> &mut Self
+    where
+        T: Tracer + Send + Sync,
+        S: Clone + Send + Sync + 'static;
+
+    /**
+    Attaches metrics middleware with provided KeyValue vec option.
+
+    See [OpenTelemetryMetricsMiddleware::new] for details.
+    */
+    #[cfg(feature = "metrics")]
+    fn with_metrics_middleware(self: &mut Self, custom_kvs: Option<Vec<KeyValue>>) -> &mut Self
+    where
+        S: Clone + Send + Sync + 'static;
+
+    /**
+    Attaches both middlewares with provided tracer and optional KeyValue vec.
+
+    See [OpenTelemetryTracingMiddleware::new] and [OpenTelemetryMetricsMiddleware::new] for details.
+    */
+    #[cfg(all(feature = "trace", feature = "metrics"))]
+    fn with_middlewares<T>(self: &mut Self, tracer: T, custom_kvs: Option<Vec<KeyValue>>) -> &mut Self
+    where
+        T: Tracer + Send + Sync,
+        S: Clone + Send + Sync + 'static;
+}
+
+impl<S> TideExt<S> for tide::Server<S> {
+    #[cfg(feature = "trace")]
+    fn with_tracing_middleware<T>(self: &mut Self, tracer: T) -> &mut Self
+    where
+        T: Tracer + Send + Sync,
+        S: Clone + Send + Sync + 'static,
+    {
+        self.with(OpenTelemetryTracingMiddleware::new(tracer))
+    }
+
+    #[cfg(feature = "metrics")]
+    fn with_metrics_middleware(self: &mut Self, custom_kvs: Option<Vec<KeyValue>>) -> &mut Self
+    where
+        S: Clone + Send + Sync + 'static,
+    {
+        self.with(OpenTelemetryMetricsMiddleware::new(custom_kvs))
+    }
+
+    #[cfg(all(feature = "trace", feature = "metrics"))]
+    fn with_middlewares<T>(self: &mut Self, tracer: T, custom_kvs: Option<Vec<KeyValue>>) -> &mut Self
+    where
+        T: Tracer + Send + Sync,
+        S: Clone + Send + Sync + 'static,
+    {
+        self.with(OpenTelemetryTracingMiddleware::new(tracer))
+            .with(OpenTelemetryMetricsMiddleware::new(custom_kvs))
+    }
+}
