@@ -84,8 +84,14 @@ impl OpenTelemetryMetricsMiddleware {
             request_count,
             error_count,
             duration,
-            duration_ms
+            duration_ms,
         }
+    }
+}
+
+impl Default for OpenTelemetryMetricsMiddleware {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
