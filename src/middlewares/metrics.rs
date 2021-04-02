@@ -59,11 +59,19 @@ impl OpenTelemetryMetricsMiddleware {
     ///
     /// ```rust,no_run
     /// let mut app = tide::new();
-    /// app.with(opentelemetry_tide::OpenTelemetryMetricsMiddleware::new());
+    /// app.with(opentelemetry_tide::OpenTelemetryMetricsMiddleware::new(None));
     /// app.at("/").get(|_| async { Ok("Metricized!") });
     /// ```
-    pub fn new() -> Self {
-        let exporter = init_meter(None);
+    ///
+    /// ## with custom KeyValue's provided
+    /// ```rust,no_run
+    /// let mut app = tide::new();
+    /// let custom_kvs = vec![opentelemetry::KeyValue::new("K","V")];
+    /// app.with(opentelemetry_tide::OpenTelemetryMetricsMiddleware::new(Some(custom_kvs)));
+    /// app.at("/").get(|_| async { Ok("Metricized!") });
+    /// ```
+    pub fn new(custom_kvs: Option<Vec<KeyValue>>) -> Self {
+        let exporter = init_meter(custom_kvs);
         // as a starting point we use RED method:
         // https://www.weave.works/blog/the-red-method-key-metrics-for-microservices-architecture/
         let meter = global::meter("red-metrics");
@@ -98,8 +106,17 @@ impl OpenTelemetryMetricsMiddleware {
 }
 
 impl Default for OpenTelemetryMetricsMiddleware {
+    /// Instantiate the middleware with defaults
+    ///
+    /// # Examples
+    ///
+    /// ```rust,no_run
+    /// let mut app = tide::new();
+    /// app.with(opentelemetry_tide::OpenTelemetryMetricsMiddleware::default());
+    /// app.at("/").get(|_| async { Ok("Metricized!") });
+    /// ```
     fn default() -> Self {
-        Self::new()
+        Self::new(None)
     }
 }
 
