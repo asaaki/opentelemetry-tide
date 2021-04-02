@@ -10,6 +10,49 @@ Additional changes to original format:
 - `Thank you for your contribution` for shout-outs to the community
 
 ## [Unreleased]
+
+## [0.7.0] - 2021-04-03
+### Added
+- middleware for metrics (`OpenTelemetryMetricsMiddleware`)
+
+  Simplest example to get it up and running:
+
+  ```rust
+  // setup
+  app.with(opentelemetry_tide::OpenTelemetryMetricsMiddleware::new(None));
+  // the rest
+  ```
+
+  Note: it will respond to `/metrics` in the same app. This routes is currently hardcoded.
+  If that clashes for you, please open an issue or send me a PR with a change.
+
+- tide::Server trait extension `TideExt` to set up middlewares more conveniently:
+
+  ```rust
+  use opentelemetry_tide::TideExt;
+
+  // for tracing only
+  app.with_tracing_middleware(tracer);
+  // for metrics only
+  app.with_metrics_middleware(None);
+  // using both together
+  app.with_middlewares(tracer, None);
+  ```
+
+  If you use `.with_middlewares`, keep in mind that the order is _trace -> metrics,_
+  so that the tracing middleware can also observe and trace calls to the `/metrics` route.
+  If that is an undesired behaviour and/or you want this configurable, please open an issue
+  or send me a PR with a change.
+  Also the method names are open for debate, but I wouldn't expect people to use many extensions, or that tide would add those names anytime soon.
+
+- feature flags `trace`, `metrics`, and `full`, with "full" being the default.
+  If you want to scope it down, use
+  ```toml
+  [dependencies]
+  opentelemetry-tide = { version = "0.7", default-features = false, features = ["trace"]
+  ```
+  for example.
+
 ### Changed
 - Update dependencies and adapt code accordingly
 
@@ -20,6 +63,7 @@ Additional changes to original format:
 - "Fix" the issue with examples' shared module
 - Improve the example code (move more setup and config to shared module)
 - Adds k6.io script and .envrc sample for load testing purposes
+- Generate readme from crate documentation and a template (using `cargo-readme`)
 
 ## [0.6.2] - 2021-03-08
 ### Changed
@@ -86,7 +130,8 @@ _(not released to crates.io)_
 ## [0.1.0] - 2020-08-01
 **Initial release**
 
-[Unreleased]: https://github.com/asaaki/opentelemetry-tide/compare/v0.6.2...HEAD
+[Unreleased]: https://github.com/asaaki/opentelemetry-tide/compare/v0.7.0...HEAD
+[0.7.0]: https://github.com/asaaki/opentelemetry-tide/compare/v0.6.2...v0.7.0
 [0.6.1]: https://github.com/asaaki/opentelemetry-tide/compare/v0.6.1...v0.6.2
 [0.6.1]: https://github.com/asaaki/opentelemetry-tide/compare/v0.6.0...v0.6.1
 [0.6.0]: https://github.com/asaaki/opentelemetry-tide/compare/v0.5.2...v0.6.0
