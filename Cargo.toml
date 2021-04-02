@@ -20,6 +20,7 @@ categories = [
 keywords = ["tide", "opentelemetry", "jaeger", "tracing", "instrumentation"]
 license = "MIT OR Apache-2.0"
 exclude = [".assets/*", ".github/*"]
+# resolver = "2"
 
 [lib]
 doctest = false
@@ -32,9 +33,18 @@ path = "examples/servers/server.rs"
 name = "front-server"
 path = "examples/servers/front-server.rs"
 
+[features]
+default = ["full"]
+full = ["trace", "metrics"]
+
+trace = ["opentelemetry/trace"]
+metrics = ["opentelemetry/metrics", "opentelemetry-prometheus", "prometheus"]
+
 [dependencies]
 opentelemetry = "0.13"
+opentelemetry-prometheus = { version = "0.6", optional = true }
 opentelemetry-semantic-conventions = "0.5"
+prometheus = { version = "0.12", optional = true }
 tide = "0.16"
 url = "2.2"
 http-types = "2.10"

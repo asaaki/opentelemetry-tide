@@ -1,8 +1,6 @@
 #![doc(hidden)]
 #![allow(unused_imports)]
 
-use std::any::Any;
-
 use opentelemetry::sdk::{
     propagation::{BaggagePropagator, TextMapCompositePropagator, TraceContextPropagator},
     trace::{self, Config, Sampler, Tracer},
