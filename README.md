@@ -1,7 +1,7 @@
 <h1 align="center"><img src="https://raw.githubusercontent.com/asaaki/opentelemetry-tide/main/.assets/opentelemetry-tide-logo.svg" width=128 height=128><br>opentelemetry-tide</h1>
 <div align="center"><strong>
 
-[OpenTelemetry][otel] integration for [Tide][tide]
+[OpenTelemetry] integration for [Tide]
 
 </strong></div><br />
 
@@ -30,16 +30,10 @@
   </a>
 </div>
 
-## Notes
+Add OpenTelemetry tracing and metrics support to your tide application.
+Be part of the new observability movement!
 
-* It only implements very basic request tracing on the middleware layer.
-  If you need spans for your executed code, you need to add them yourself.
-* The majority of the implementation is based on <https://github.com/OutThereLabs/actix-web-opentelemetry>.
-* It does not provide metrics, so it cannot be used for Prometheus metrics. Yet. Maybe I'll add it in the future.
-  Or you want to contribute the extension. ;-)
-* You probably do not want to use it in production. 🤷
-
-## How to use
+### How to use
 
 ```sh
 # Run jaeger in background
@@ -55,63 +49,76 @@ curl http://localhost:3000/
 
 # Open browser and view the traces
 firefox http://localhost:16686/
+
+# Check the prometheus metrics endpoint
+curl http://localhost:3000/metrics
 ```
 
-![example jaeger trace](https://raw.githubusercontent.com/asaaki/opentelemetry-tide/main/.assets/jaeger-trace.png)
-
-### Code example
+### Example
 
 #### `Cargo.toml`
 
 ```toml
+# ...
+
 [dependencies]
-async-std = {version =  "1.9", features = ["attributes"]}
-opentelemetry = { version = "0.12", features = ["async-std"] }
-opentelemetry-jaeger = { version = "0.11", features = ["async-std"] }
-opentelemetry-tide = "0.6"
-tide = "0.15"
+async-std = { version = "1.9", features = ["attributes"] }
+opentelemetry = { version = "0.13", features = ["async-std", "rt-async-std"] }
+opentelemetry-jaeger = { version = "0.12", features = ["async-std"] }
+opentelemetry-tide = "0.7"
+tide = "0.16"
 ```
 
 #### `server.rs`
 
 ```rust
-use opentelemetry::global as otel_global;
-use opentelemetry::sdk::propagation::TraceContextPropagator;
+use opentelemetry::{global, KeyValue, runtime};
 use opentelemetry_semantic_conventions::resource;
-use opentelemetry_tide::OpenTelemetryTracingMiddleware;
+use opentelemetry_tide::TideExt;
 
-const VERSION: &str = env!("CARGO_PKG_VERSION");
+const VERSION: &'static str = env!("CARGO_PKG_VERSION");
 
 #[async_std::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    tide::log::start();
-    otel_global::set_text_map_propagator(TraceContextPropagator::new());
+    tide::log::with_level(tide::log::LevelFilter::Warn);
 
     let tags = [resource::SERVICE_VERSION.string(VERSION)];
 
-    let (tracer, _uninstall) = opentelemetry_jaeger::new_pipeline()
+    let tracer = opentelemetry_jaeger::new_pipeline()
         .with_service_name("example-server")
         .with_tags(tags.iter().map(ToOwned::to_owned))
-        .install()
+        .install_batch(runtime::AsyncStd)
         .expect("pipeline install failure");
 
+    let metrics_kvs = vec![KeyValue::new("K", "V")];
+
     let mut app = tide::new();
-    app.with(OpenTelemetryTracingMiddleware::new(tracer));
-    app.at("/").get(|_| async move { Ok("Hello, OpenTelemetry!") });
-    app.listen("127.0.0.1:3000").await?;
+
+    app.with_middlewares(tracer, Some(metrics_kvs));
+
+    app.at("/").get(|_| async move {
+        Ok("Hello, OpenTelemetry!")
+    });
+
+    app.listen("0.0.0.0:3000").await?;
+
+    global::shutdown_tracer_provider();
 
     Ok(())
 }
 ```
 
+### Cargo Features
 
+|      flag | description |
+| --------: | :---------- |
+|   `trace` | enables **tracing** middleware; enabled by default via `full`
+| `metrics` | enables **metrics** middleware; enabled by default via `full`
+|    `full` | includes both `trace` and `metrics` features, enabled by default
 
-## Cargo Features:
+### Safety
 
-## Safety
-
-This crate uses ``#![forbid(unsafe_code)]`` to ensure everything is implemented in
-100% Safe Rust.
+This crate uses ``#![forbid(unsafe_code)]`` to ensure everything is implemented in 100% Safe Rust.
 
 ## License
 
@@ -128,9 +135,8 @@ for inclusion in this crate by you, as defined in the Apache-2.0 license, shall
 be dual licensed as above, without any additional terms or conditions.
 </sub>
 
-
-
 <!-- links -->
-[otel]: https://crates.io/crates/opentelemetry
-[surf]: https://crates.io/crates/surf
-[tide]: https://crates.io/crates/tide
+[OpenTelemetry]: https://crates.io/crates/opentelemetry
+[Surf]: https://crates.io/crates/surf
+[Tide]: https://crates.io/crates/tide
+[RED method]: https://www.weave.works/blog/the-red-method-key-metrics-for-microservices-architecture/

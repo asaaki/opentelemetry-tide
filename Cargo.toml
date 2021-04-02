@@ -19,10 +19,11 @@ categories = [
 ]
 keywords = ["tide", "opentelemetry", "jaeger", "tracing", "instrumentation"]
 license = "MIT OR Apache-2.0"
-exclude = [".assets/*", ".github/*"]
+exclude = [".assets/*", ".github/*", "README.tpl"]
 # resolver = "2"
 
 [lib]
+path = "src/lib.rs"
 doctest = false
 
 [[example]]
