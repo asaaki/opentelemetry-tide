@@ -16,12 +16,15 @@ const ROUTE_KEY: Key = Key::from_static_str("http_route");
 const METHOD_KEY: Key = Key::from_static_str("http_method");
 const STATUS_KEY: Key = Key::from_static_str("http_status_code");
 
+// I chose the 1, 5, 10, 50, … stepping as a compromise between enough details and small data set size
+#[rustfmt::skip]
 const HISTOGRAM_BOUNDARIES: [f64; 15] = [
-    0.000100, 0.000500,
-    0.001, 0.005, 0.010, 0.050, 0.100, 0.500,
-    1.000, 5.000, 10.000,
+    0.000100, 0.000500,                       // nanoseconds on ms base, ms on a seconds base
+    0.001, 0.005, 0.010, 0.050, 0.100, 0.500, // μs on ms base, ms on seconds base
+    1.000, 5.000, 10.000,                     // ms or seconds hereafter, depending on base
     50.000, 100.000, 500.000,
-    1000.000];
+    1000.000
+];
 const SUMMARY_QUANTILES: [f64; 6] = [0.50, 0.75, 0.90, 0.95, 0.99, 0.999];
 
 /// The middleware struct to be used in tide
