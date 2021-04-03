@@ -33,7 +33,15 @@
 Add OpenTelemetry tracing and metrics support to your tide application.
 Be part of the new observability movement!
 
-### How to use
+## Notes
+
+* It only implements very basic request tracing on the middleware layer.
+  If you need spans for your executed code, you need to add them yourself.
+* The majority of the implementation is based on <https://github.com/OutThereLabs/actix-web-opentelemetry>.
+* It provides basic prometheus metrics, based on the [RED method].
+* You probably do not want to use it in production. 🤷
+
+## How to use
 
 ```sh
 # Run jaeger in background
@@ -54,9 +62,9 @@ firefox http://localhost:16686/
 curl http://localhost:3000/metrics
 ```
 
-### Example
+## Example
 
-#### `Cargo.toml`
+### `Cargo.toml`
 
 ```toml
 # ...
@@ -69,7 +77,7 @@ opentelemetry-tide = "0.7"
 tide = "0.16"
 ```
 
-#### `server.rs`
+### `server.rs`
 
 ```rust
 use opentelemetry::{global, KeyValue, runtime};
@@ -108,7 +116,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 ```
 
-### Cargo Features
+## Cargo Features
 
 |      flag | description |
 | --------: | :---------- |
@@ -116,9 +124,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 | `metrics` | enables **metrics** middleware; enabled by default via `full`
 |    `full` | includes both `trace` and `metrics` features, enabled by default
 
-### Safety
+## Safety
 
 This crate uses ``#![forbid(unsafe_code)]`` to ensure everything is implemented in 100% Safe Rust.
+
+
+<!-- links -->
+[RED method]: https://www.weave.works/blog/the-red-method-key-metrics-for-microservices-architecture/
 
 ## License
 
@@ -137,6 +149,4 @@ be dual licensed as above, without any additional terms or conditions.
 
 <!-- links -->
 [OpenTelemetry]: https://crates.io/crates/opentelemetry
-[Surf]: https://crates.io/crates/surf
 [Tide]: https://crates.io/crates/tide
-[RED method]: https://www.weave.works/blog/the-red-method-key-metrics-for-microservices-architecture/

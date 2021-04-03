@@ -49,6 +49,4 @@ be dual licensed as above, without any additional terms or conditions.
 
 <!-- links -->
 [OpenTelemetry]: https://crates.io/crates/opentelemetry
-[Surf]: https://crates.io/crates/surf
 [Tide]: https://crates.io/crates/tide
-[RED method]: https://www.weave.works/blog/the-red-method-key-metrics-for-microservices-architecture/
