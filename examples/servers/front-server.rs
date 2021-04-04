@@ -40,8 +40,12 @@ async fn main() -> MainResult {
     let tracer = shared::jaeger_tracer(SVC_NAME, VERSION, "frontend-753")?;
 
     let mut app = tide::with_state(surf::client());
-    let mut config = opentelemetry_tide::MetricsConfig::default();
-    config.global_labels = Some(vec![opentelemetry::KeyValue::new("K","V")]);
+    let route = std::env::var("METRICS_ROUTE").unwrap_or_else(|_| "/metrics".into());
+    let config = opentelemetry_tide::MetricsConfig {
+        route,
+        global_labels: Some(vec![opentelemetry::KeyValue::new("K", "V")]),
+        ..Default::default()
+    };
     app.with_middlewares(tracer, config);
 
     app.at("/").get(|req: Request<surf::Client>| async move {

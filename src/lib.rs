@@ -129,7 +129,7 @@ mod middlewares;
 pub use middlewares::tracing::OpenTelemetryTracingMiddleware;
 
 #[cfg(feature = "metrics")]
-pub use middlewares::metrics::{OpenTelemetryMetricsMiddleware, MetricsConfig};
+pub use middlewares::metrics::{MetricsConfig, OpenTelemetryMetricsMiddleware};
 
 /// this extension trait provides convenience methods for attaching middlewares of this crate
 pub trait TideExt<S> {

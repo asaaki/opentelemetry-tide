@@ -1,5 +1,10 @@
 use http_types::{Body, StatusCode};
-use opentelemetry::{Key, KeyValue, Unit, global, metrics::{Counter, ValueRecorder}, sdk::Resource};
+use opentelemetry::{
+    global,
+    metrics::{Counter, ValueRecorder},
+    sdk::Resource,
+    Key, KeyValue, Unit,
+};
 use opentelemetry_prometheus::PrometheusExporter;
 use prometheus::{Encoder, TextEncoder};
 use std::time::SystemTime;
@@ -45,28 +50,37 @@ pub struct MetricsConfig {
     pub boundaries: Vec<f64>,
     /// A vec of summary quantiles (currently no prometheus-exportable metric is using them)
     pub quantiles: Vec<f64>,
+    /// The route which will be used for metrics scraping by prometheus
+    pub route: String,
 }
 
 impl MetricsConfig {
     /// Initializes a MetricsConfig
-    pub fn new(global_labels: Option<Vec<KeyValue>>, boundaries: Vec<f64>, quantiles: Vec<f64>) -> Self {
+    pub fn new(global_labels: Option<Vec<KeyValue>>, boundaries: Vec<f64>, quantiles: Vec<f64>, route: String) -> Self {
         Self {
             global_labels,
             boundaries,
             quantiles,
+            route,
         }
     }
 }
 
 impl Default for MetricsConfig {
     fn default() -> Self {
-        Self::new(None, HISTOGRAM_BOUNDARIES.to_vec(), SUMMARY_QUANTILES.to_vec())
+        Self::new(
+            None,
+            HISTOGRAM_BOUNDARIES.to_vec(),
+            SUMMARY_QUANTILES.to_vec(),
+            DEFAULT_METRICS_ROUTE.to_owned(),
+        )
     }
 }
 
 /// The middleware struct to be used in tide
 #[derive(Debug)]
 pub struct OpenTelemetryMetricsMiddleware {
+    route: String,
     exporter: PrometheusExporter,
     request_count: Counter<u64>,
     error_count: Counter<u64>,
@@ -77,8 +91,8 @@ pub struct OpenTelemetryMetricsMiddleware {
 #[allow(dead_code)]
 fn build_exporter_and_init_meter(config: MetricsConfig) -> PrometheusExporter {
     let mut builder = opentelemetry_prometheus::exporter()
-            .with_default_histogram_boundaries(config.boundaries)
-            .with_default_summary_quantiles(config.quantiles);
+        .with_default_histogram_boundaries(config.boundaries)
+        .with_default_summary_quantiles(config.quantiles);
     if let Some(global_labels) = config.global_labels {
         builder = builder.with_resource(Resource::new(global_labels));
     }
@@ -105,6 +119,7 @@ impl OpenTelemetryMetricsMiddleware {
     /// app.at("/").get(|_| async { Ok("Metricized!") });
     /// ```
     pub fn new(config: MetricsConfig) -> Self {
+        let route = config.route.clone();
         let exporter = build_exporter_and_init_meter(config);
         // As a starting point we use RED method:
         // * https://www.weave.works/blog/the-red-method-key-metrics-for-microservices-architecture/
@@ -132,6 +147,7 @@ impl OpenTelemetryMetricsMiddleware {
             .init();
 
         Self {
+            route,
             exporter,
             request_count,
             error_count,
@@ -159,7 +175,7 @@ impl Default for OpenTelemetryMetricsMiddleware {
 #[tide::utils::async_trait]
 impl<State: Clone + Send + Sync + 'static> Middleware<State> for OpenTelemetryMetricsMiddleware {
     async fn handle(&self, req: Request<State>, next: Next<'_, State>) -> Result {
-        if req.url().path() == DEFAULT_METRICS_ROUTE {
+        if req.url().path() == self.route {
             let encoder = TextEncoder::new();
             let metric_families = self.exporter.registry().gather();
             let mut result = Vec::new();
