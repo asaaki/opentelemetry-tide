@@ -1,16 +1,20 @@
-//! Example "frontend" server for testing distributed traces
-//!
-//! Start backend before making any calls to the frontend
-//! ```sh
-//! cargo run --example server
-//! ```
-//!
-//! Basic call
-//! ```sh
-//! curl 'http://127.0.0.1:4000/' -i
-//! ```
-//!
-//! And then check jaeger to see multiple spans across services.
+/*!
+Example "frontend" server for testing distributed traces
+
+Start backend before making any calls to the frontend
+
+```sh
+cargo run --example server
+```
+
+Basic call
+
+```sh
+curl 'http://127.0.0.1:4000/' -i
+```
+
+And then check jaeger to see multiple spans across services.
+*/
 
 use opentelemetry::{
     global,
@@ -36,7 +40,9 @@ async fn main() -> MainResult {
     let tracer = shared::jaeger_tracer(SVC_NAME, VERSION, "frontend-753")?;
 
     let mut app = tide::with_state(surf::client());
-    app.with_middlewares(tracer, None);
+    let mut config = opentelemetry_tide::MetricsConfig::default();
+    config.global_labels = Some(vec![opentelemetry::KeyValue::new("K","V")]);
+    app.with_middlewares(tracer, config);
 
     app.at("/").get(|req: Request<surf::Client>| async move {
         // collect current tracing data, so we can pass it down

@@ -1,10 +1,5 @@
 use http_types::{Body, StatusCode};
-use opentelemetry::{
-    global,
-    metrics::{Counter, ValueRecorder},
-    sdk::Resource,
-    Key, KeyValue, Unit,
-};
+use opentelemetry::{Key, KeyValue, Unit, global, metrics::{Counter, ValueRecorder}, sdk::Resource};
 use opentelemetry_prometheus::PrometheusExporter;
 use prometheus::{Encoder, TextEncoder};
 use std::time::SystemTime;
@@ -16,15 +11,58 @@ const ROUTE_KEY: Key = Key::from_static_str("http_route");
 const METHOD_KEY: Key = Key::from_static_str("http_method");
 const STATUS_KEY: Key = Key::from_static_str("http_status_code");
 
-// I chose the 1, 5, 10, 50, … stepping as a compromise between enough details and small data set size
 #[rustfmt::skip]
-const HISTOGRAM_BOUNDARIES: [f64; 15] = [
-    0.000100, 0.000500,                       // nanoseconds on ms base, ms on a seconds base
-    0.001, 0.005, 0.010, 0.050, 0.100, 0.500, // μs on ms base, ms on seconds base
-    1.000, 5.000, 10.000,                     // ms or seconds hereafter, depending on base
-    50.000, 100.000, 500.000,
-    1000.000
+const HISTOGRAM_BOUNDARIES: [f64; 31] = [
+    0.001, 0.002, 0.004, 0.006, 0.008,
+    0.01, 0.02, 0.04, 0.06, 0.08,
+    0.1, 0.2, 0.4, 0.6, 0.8,
+    1.0, 2.0, 4.0, 6.0, 8.0,
+    10.0, 20.0, 40.0, 60.0, 80.0,
+    100.0, 200.0, 400.0, 600.0, 800.0,
+    1000.0,
 ];
+
+#[rustfmt::skip]
+const SUMMARY_QUANTILES: [f64; 8] = [
+    0.5, 0.75,
+    0.90, 0.95,
+    0.99, 0.999, 0.9999, 0.99999, // the nines
+];
+
+/**
+Configuration for the metrics middleware
+
+Unless you need specific values, [MetricsConfig::default()] should be fine for most use cases.
+
+In your application you can shortcut that further down to `Default::default()`,
+so you don't have to bring this struct into scope with a `use`.
+*/
+#[derive(Debug)]
+pub struct MetricsConfig {
+    /// Optional vec of key value pairs which then get added as labels to all metrics
+    pub global_labels: Option<Vec<KeyValue>>,
+    /// A vec of histogram boundaries; set your own fine-tuned buckets for your services
+    pub boundaries: Vec<f64>,
+    /// A vec of summary quantiles (currently no prometheus-exportable metric is using them)
+    pub quantiles: Vec<f64>,
+}
+
+impl MetricsConfig {
+    /// Initializes a MetricsConfig
+    pub fn new(global_labels: Option<Vec<KeyValue>>, boundaries: Vec<f64>, quantiles: Vec<f64>) -> Self {
+        Self {
+            global_labels,
+            boundaries,
+            quantiles,
+        }
+    }
+}
+
+impl Default for MetricsConfig {
+    fn default() -> Self {
+        Self::new(None, HISTOGRAM_BOUNDARIES.to_vec(), SUMMARY_QUANTILES.to_vec())
+    }
+}
 
 /// The middleware struct to be used in tide
 #[derive(Debug)]
@@ -36,17 +74,15 @@ pub struct OpenTelemetryMetricsMiddleware {
     duration_ms: ValueRecorder<f64>,
 }
 
-fn init_meter(custom_kvs: Option<Vec<KeyValue>>) -> PrometheusExporter {
-    if let Some(kvs) = custom_kvs {
-        opentelemetry_prometheus::exporter()
-            .with_default_histogram_boundaries(HISTOGRAM_BOUNDARIES.to_vec())
-            .with_resource(Resource::new(kvs))
-            .init()
-    } else {
-        opentelemetry_prometheus::exporter()
-            .with_default_histogram_boundaries(HISTOGRAM_BOUNDARIES.to_vec())
-            .init()
+#[allow(dead_code)]
+fn build_exporter_and_init_meter(config: MetricsConfig) -> PrometheusExporter {
+    let mut builder = opentelemetry_prometheus::exporter()
+            .with_default_histogram_boundaries(config.boundaries)
+            .with_default_summary_quantiles(config.quantiles);
+    if let Some(global_labels) = config.global_labels {
+        builder = builder.with_resource(Resource::new(global_labels));
     }
+    builder.init()
 }
 
 impl OpenTelemetryMetricsMiddleware {
@@ -60,17 +96,20 @@ impl OpenTelemetryMetricsMiddleware {
     /// app.at("/").get(|_| async { Ok("Metricized!") });
     /// ```
     ///
-    /// ## with custom KeyValue's provided
+    /// ## with custom metrics configuration
     /// ```rust,no_run
     /// let mut app = tide::new();
-    /// let custom_kvs = vec![opentelemetry::KeyValue::new("K","V")];
+    /// let mut config = opentelemetry_tide::MetricsConfig::default();
+    /// config.global_tags = Some(vec![opentelemetry::KeyValue::new("K","V")];)
     /// app.with(opentelemetry_tide::OpenTelemetryMetricsMiddleware::new(Some(custom_kvs)));
     /// app.at("/").get(|_| async { Ok("Metricized!") });
     /// ```
-    pub fn new(custom_kvs: Option<Vec<KeyValue>>) -> Self {
-        let exporter = init_meter(custom_kvs);
-        // as a starting point we use RED method:
-        // https://www.weave.works/blog/the-red-method-key-metrics-for-microservices-architecture/
+    pub fn new(config: MetricsConfig) -> Self {
+        let exporter = build_exporter_and_init_meter(config);
+        // As a starting point we use RED method:
+        // * https://www.weave.works/blog/the-red-method-key-metrics-for-microservices-architecture/
+        // * https://grafana.com/files/grafanacon_eu_2018/Tom_Wilkie_GrafanaCon_EU_2018.pdf
+        // * http://www.brendangregg.com/usemethod.html
         let meter = global::meter("red-metrics");
         let request_count = meter
             .u64_counter("http_server_requests_count")
@@ -113,7 +152,7 @@ impl Default for OpenTelemetryMetricsMiddleware {
     /// app.at("/").get(|_| async { Ok("Metricized!") });
     /// ```
     fn default() -> Self {
-        Self::new(None)
+        Self::new(MetricsConfig::default())
     }
 }
 
