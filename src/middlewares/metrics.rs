@@ -57,7 +57,7 @@ pub struct MetricsConfig {
     // fake non_exhaustive to "enforce" usage of `..Default::default()` during construction time;
     // @see <https://xaeroxe.github.io/init-struct-pattern/>
     #[doc(hidden)]
-    pub __non_exhaustive: ()
+    pub __non_exhaustive: (),
 }
 
 impl MetricsConfig {
