@@ -1,9 +1,12 @@
 name: Security Audit
+
 on:
   push:
     paths:
       - '**/Cargo.toml'
       - '**/Cargo.lock'
+  schedule:
+    - cron: '23 5 * * *'
 
 jobs:
   security_audit:
