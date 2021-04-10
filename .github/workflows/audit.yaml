@@ -1,10 +1,11 @@
 name: Security Audit
 
 on:
+  pull_request:
+    paths: ['**/Cargo.toml', '**/Cargo.lock']
   push:
-    paths:
-      - '**/Cargo.toml'
-      - '**/Cargo.lock'
+    branches: [main]
+    paths: ['**/Cargo.toml', '**/Cargo.lock']
   schedule:
     - cron: '23 5 * * *'
 
@@ -14,6 +15,14 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: Swatinem/rust-cache@v1
-      - uses: actions-rs/audit-check@v1
+      - uses: actions-rs/toolchain@v1
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          toolchain: stable
+          override: true
+      - name: Install cargo audit
+        run: cargo install cargo-audit
+      - name: Run cargo audit
+        run: |
+          cargo audit \
+            --deny warnings \
+            --ignore RUSTSEC-2020-0056
