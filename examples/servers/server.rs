@@ -14,7 +14,7 @@ curl 'http://127.0.0.1:3000/' -H 'traceparent: 00-001100220033004400550066007700
 ```
 */
 
-use opentelemetry_tide::TideExt;
+use opentelemetry_tide::{MetricsConfig, TideExt};
 
 mod shared;
 
@@ -31,7 +31,7 @@ async fn main() -> MainResult {
     let tracer = shared::jaeger_tracer(SVC_NAME, VERSION, "backend-123")?;
 
     let mut app = tide::new();
-    app.with_middlewares(tracer, Default::default());
+    app.with_middlewares(tracer, MetricsConfig::default());
     app.at("/").get(|_| async move { Ok("Hello, OpenTelemetry!") });
 
     app.listen("0.0.0.0:3000").await?;

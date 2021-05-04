@@ -10,6 +10,34 @@ Additional changes to original format:
 - `Thank you for your contribution` for shout-outs to the community
 
 ## [Unreleased]
+### Added
+- `MetricsConfig` to provide a more convenient and publicly accessible way of
+  configuring the metrics middleware;
+  this allows you to also align histogram boundaries across your services, even if you do not use
+  this crate at all (prometheus loves to have a defined set of buckets for identical metrics)
+
+  Usage example:
+
+  ```rust
+  use opentelemetry_tide::{MetricsConfig, TideExt};
+  // ... snip ...
+  app.with_middlewares(tracer, MetricsConfig::default());
+  ```
+
+### Changed
+- metrics endpoint is configurable now
+- histogram boundaries default buckets
+  - more granular steppings
+  - lower bound is now `0.001` instead of `0.0001`
+- (new) summary quantiles default, which has more different nines buckets than the upstream default;
+  currently the summary is not really used anywhere yet, otel rust/prom need some changes/features
+  exposed to users, yet we still want to communicate a more desired standard nature *if* we would
+  use summaries somewhere
+
+### Cosmetic
+- Fix formatting and notes in README.md
+- Ignore "RUSTSEC-2020-0056: stdweb is unmaintained" (#11)
+- Use cargo audit directly, as `actions-rs/audit-check` does not support ignore option
 
 ## [0.7.0] - 2021-04-03
 ### Added

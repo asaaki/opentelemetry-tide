@@ -21,7 +21,7 @@ use opentelemetry::{
     trace::{FutureExt, TraceContextExt, Tracer},
     Context,
 };
-use opentelemetry_tide::TideExt;
+use opentelemetry_tide::{MetricsConfig, TideExt};
 use std::collections::HashMap;
 use tide::Request;
 
@@ -41,10 +41,10 @@ async fn main() -> MainResult {
 
     let mut app = tide::with_state(surf::client());
     let route = std::env::var("METRICS_ROUTE").unwrap_or_else(|_| "/metrics".into());
-    let config = opentelemetry_tide::MetricsConfig {
+    let config = MetricsConfig {
         route,
         global_labels: Some(vec![opentelemetry::KeyValue::new("K", "V")]),
-        ..Default::default()
+        ..MetricsConfig::default()
     };
     app.with_middlewares(tracer, config);
 
