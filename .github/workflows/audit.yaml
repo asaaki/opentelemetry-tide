@@ -22,7 +22,4 @@ jobs:
       - name: Install cargo audit
         run: cargo install cargo-audit
       - name: Run cargo audit
-        run: |
-          cargo audit \
-            --deny warnings \
-            --ignore RUSTSEC-2020-0056
+        run: cargo audit

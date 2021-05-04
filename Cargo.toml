@@ -48,7 +48,7 @@ opentelemetry-semantic-conventions = "0.5"
 prometheus = { version = "0.12", optional = true }
 tide = "0.16"
 url = "2.2"
-http-types = "2.10"
+http-types = "2.11"
 kv-log-macro = "1.0"
 
 [dev-dependencies]

@@ -1,0 +1,12 @@
+# https://github.com/RustSec/cargo-audit/blob/main/audit.toml.example
+
+[advisories]
+# last 2 are about aes merges;
+# should resolve once the downstream chain got some updates:
+# http_types -> cookie (0.15.1+) -> aes-gcm (0.9.0+) -> aes (0.7.0+)
+ignore = ["RUSTSEC-2020-0056", "RUSTSEC-2021-0059", "RUSTSEC-2021-0060"]
+informational_warnings = ["unmaintained", "unsound"]
+
+[output]
+quiet = false
+deny = ["warnings"]
