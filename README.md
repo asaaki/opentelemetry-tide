@@ -37,8 +37,8 @@ Be part of the new observability movement!
 
 * It only implements very basic request tracing on the middleware layer.
   If you need spans for your executed code, you need to add them yourself.
-* The majority of the implementation is based on <https://github.com/OutThereLabs/actix-web-opentelemetry>.
 * It provides basic prometheus metrics, based on the [RED method].
+* This project got inspired by <https://github.com/OutThereLabs/actix-web-opentelemetry>.
 * You probably do not want to use it in production. 🤷
 
 ## How to use
@@ -73,7 +73,7 @@ curl http://localhost:3000/metrics
 async-std = { version = "1.9", features = ["attributes"] }
 opentelemetry = { version = "0.14", features = ["async-std", "rt-async-std"] }
 opentelemetry-jaeger = { version = "0.13", features = ["async-std"] }
-opentelemetry-tide = "0.8"
+opentelemetry-tide = "0.9"
 tide = "0.16"
 ```
 

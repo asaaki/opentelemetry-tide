@@ -62,7 +62,7 @@ impl MetricsConfig {
             global_labels,
             boundaries,
             quantiles,
-            route
+            route,
         }
     }
 }
