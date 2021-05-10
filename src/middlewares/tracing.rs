@@ -84,18 +84,18 @@ impl<T: Tracer + Send + Sync, State: Clone + Send + Sync + 'static> Middleware<S
 
         let mut span_builder = self
             .tracer
-            .span_builder(&format!("{} {}", method, url))
+            .span_builder(format!("{} {}", method, url))
             .with_kind(SpanKind::Server)
             .with_attributes(attributes);
 
         // make sure our span can be connected to a currently open/active (remote) trace if existing
-        if let Some(remote_span_ctx) = parent_cx.remote_span_context() {
-            if remote_span_ctx.is_remote() {
-                span_builder = span_builder.with_parent_context(parent_cx.clone());
-            }
+        // if let Some(remote_span_ctx) = parent_cx.span().span_context() {
+        // }
+        if parent_cx.span().span_context().is_remote() {
+            span_builder = span_builder.with_parent_context(parent_cx.clone());
         }
 
-        let span = span_builder.start(&self.tracer);
+        let mut span = span_builder.start(&self.tracer);
         span.add_event("request.started".to_owned(), vec![]);
         let cx = &Context::current_with_span(span);
 

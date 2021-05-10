@@ -33,6 +33,7 @@ Additional changes to original format:
   currently the summary is not really used anywhere yet, otel rust/prom need some changes/features
   exposed to users, yet we still want to communicate a more desired standard nature *if* we would
   use summaries somewhere
+- Update dependencies and adapt code accordingly
 
 ### Cosmetic
 - Fix formatting and notes in README.md

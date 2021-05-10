@@ -71,8 +71,8 @@ curl http://localhost:3000/metrics
 
 [dependencies]
 async-std = { version = "1.9", features = ["attributes"] }
-opentelemetry = { version = "0.13", features = ["async-std", "rt-async-std"] }
-opentelemetry-jaeger = { version = "0.12", features = ["async-std"] }
+opentelemetry = { version = "0.14", features = ["async-std", "rt-async-std"] }
+opentelemetry-jaeger = { version = "0.13", features = ["async-std"] }
 opentelemetry-tide = "0.7"
 tide = "0.16"
 ```
