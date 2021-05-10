@@ -6,8 +6,8 @@ Be part of the new observability movement!
 
 * It only implements very basic request tracing on the middleware layer.
   If you need spans for your executed code, you need to add them yourself.
-* The majority of the implementation is based on <https://github.com/OutThereLabs/actix-web-opentelemetry>.
 * It provides basic prometheus metrics, based on the [RED method].
+* This project got inspired by <https://github.com/OutThereLabs/actix-web-opentelemetry>.
 * You probably do not want to use it in production. 🤷
 
 # How to use
