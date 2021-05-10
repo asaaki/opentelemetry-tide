@@ -10,6 +10,9 @@ Additional changes to original format:
 - `Thank you for your contribution` for shout-outs to the community
 
 ## [Unreleased]
+
+## [0.8.0] - 2021-05-10
+
 ### Added
 - `MetricsConfig` to provide a more convenient and publicly accessible way of
   configuring the metrics middleware;
@@ -162,7 +165,8 @@ _(not released to crates.io)_
 ## [0.1.0] - 2020-08-01
 **Initial release**
 
-[Unreleased]: https://github.com/asaaki/opentelemetry-tide/compare/v0.7.0...HEAD
+[Unreleased]: https://github.com/asaaki/opentelemetry-tide/compare/v0.8.0...HEAD
+[0.8.0]: https://github.com/asaaki/opentelemetry-tide/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/asaaki/opentelemetry-tide/compare/v0.6.2...v0.7.0
 [0.6.1]: https://github.com/asaaki/opentelemetry-tide/compare/v0.6.1...v0.6.2
 [0.6.1]: https://github.com/asaaki/opentelemetry-tide/compare/v0.6.0...v0.6.1
