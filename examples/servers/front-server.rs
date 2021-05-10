@@ -86,6 +86,7 @@ async fn main() -> MainResult {
     });
 
     app.listen("0.0.0.0:4000").await?;
+    opentelemetry::global::force_flush_tracer_provider();
     opentelemetry::global::shutdown_tracer_provider();
     Ok(())
 }

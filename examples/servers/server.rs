@@ -35,6 +35,7 @@ async fn main() -> MainResult {
     app.at("/").get(|_| async move { Ok("Hello, OpenTelemetry!") });
 
     app.listen("0.0.0.0:3000").await?;
+    opentelemetry::global::force_flush_tracer_provider();
     opentelemetry::global::shutdown_tracer_provider();
     Ok(())
 }
