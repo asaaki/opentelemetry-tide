@@ -53,11 +53,6 @@ pub struct MetricsConfig {
     pub quantiles: Vec<f64>,
     /// The route which will be used for metrics scraping by prometheus
     pub route: String,
-
-    // fake non_exhaustive to "enforce" usage of `..Default::default()` during construction time;
-    // @see <https://xaeroxe.github.io/init-struct-pattern/>
-    #[doc(hidden)]
-    pub __non_exhaustive: (),
 }
 
 impl MetricsConfig {
@@ -67,8 +62,7 @@ impl MetricsConfig {
             global_labels,
             boundaries,
             quantiles,
-            route,
-            ..Default::default()
+            route
         }
     }
 }

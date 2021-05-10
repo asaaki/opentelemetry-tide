@@ -10,6 +10,8 @@ Additional changes to original format:
 - `Thank you for your contribution` for shout-outs to the community
 
 ## [Unreleased]
+### Fixed
+- `MetricsConfig` would cause a stack overflow on construction
 
 ## [0.8.0] - 2021-05-10
 
