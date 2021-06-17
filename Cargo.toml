@@ -44,7 +44,7 @@ metrics = ["opentelemetry/metrics", "opentelemetry-prometheus", "prometheus"]
 [dependencies]
 opentelemetry = "0.14"
 opentelemetry-prometheus = { version = "0.7", optional = true }
-opentelemetry-semantic-conventions = "0.6"
+opentelemetry-semantic-conventions = "0.7"
 prometheus = { version = "0.12", optional = true }
 tide = "0.16"
 url = "2.2"
