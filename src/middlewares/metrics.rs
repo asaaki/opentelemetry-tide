@@ -1,7 +1,7 @@
 use http_types::{Body, StatusCode};
 use opentelemetry::{
     global,
-    metrics::{Counter, ValueRecorder, Unit},
+    metrics::{Counter, Unit, ValueRecorder},
     sdk::Resource,
     Key, KeyValue,
 };
