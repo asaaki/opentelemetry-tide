@@ -1,9 +1,9 @@
 use http_types::{Body, StatusCode};
 use opentelemetry::{
     global,
-    metrics::{Counter, ValueRecorder},
+    metrics::{Counter, ValueRecorder, Unit},
     sdk::Resource,
-    Key, KeyValue, Unit,
+    Key, KeyValue,
 };
 use opentelemetry_prometheus::PrometheusExporter;
 use prometheus::{Encoder, TextEncoder};
