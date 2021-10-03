@@ -114,7 +114,7 @@ impl<T: Tracer + Send + Sync, State: Clone + Send + Sync + 'static> Middleware<S
 
         // write trace info to response, so it can be picked up by downstream services
         let mut injector = HashMap::new();
-        global::get_text_map_propagator(|propagator| propagator.inject_context(&cx, &mut injector));
+        global::get_text_map_propagator(|propagator| propagator.inject_context(cx, &mut injector));
 
         for (k, v) in injector {
             let header_name = HeaderName::from_bytes(k.clone().into_bytes());

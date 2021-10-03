@@ -13,5 +13,5 @@ fn generate_build_vars(output_path: &Path) {
 fn main() {
     let out_dir = env::var_os("OUT_DIR").expect("OUT_DIR not specified");
     let out_path = Path::new(&out_dir);
-    generate_build_vars(&out_path);
+    generate_build_vars(out_path);
 }
