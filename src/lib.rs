@@ -4,7 +4,6 @@
     html_favicon_url = "https://raw.githubusercontent.com/asaaki/opentelemetry-tide/main/.assets/favicon.ico",
     html_logo_url = "https://raw.githubusercontent.com/asaaki/opentelemetry-tide/main/.assets/docs.png"
 )]
-
 #![forbid(unsafe_code)]
 #![cfg_attr(feature = "docs", feature(doc_cfg))]
 #![deny(missing_docs)]
