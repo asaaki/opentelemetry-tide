@@ -11,6 +11,21 @@ Additional changes to original format:
 
 ## [Unreleased]
 
+## [0.11.0] - 2021-10-03 — _German Unity Edition_
+### Changed
+- Update dependencies
+
+  ```toml
+  [dependencies]
+  opentelemetry = "0.16.0"
+  opentelemetry-prometheus = { version = "0.9.0", optional = true }
+  opentelemetry-semantic-conventions = "0.8.0"
+  ```
+
+### Cosmetic
+- Use Rust 1.54's new feature to include the README content into the crate doc via a macro call;
+  see <https://blog.rust-lang.org/2021/07/29/Rust-1.54.0.html#attributes-can-invoke-function-like-macros>
+
 ## [0.10.0] - 2021-07-28
 ### Changed
 - Update dependencies
@@ -173,7 +188,8 @@ _(not released to crates.io)_
 ## [0.1.0] - 2020-08-01
 **Initial release**
 
-[Unreleased]: https://github.com/asaaki/opentelemetry-tide/compare/v0.10.0...HEAD
+[Unreleased]: https://github.com/asaaki/opentelemetry-tide/compare/v0.11.0...HEAD
+[0.11.0]: https://github.com/asaaki/opentelemetry-tide/compare/v0.10.0...v0.11.0
 [0.10.0]: https://github.com/asaaki/opentelemetry-tide/compare/v0.9.0...v0.10.0
 [0.9.0]: https://github.com/asaaki/opentelemetry-tide/compare/v0.8.0...v0.9.0
 [0.8.0]: https://github.com/asaaki/opentelemetry-tide/compare/v0.7.0...v0.8.0
