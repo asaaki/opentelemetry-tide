@@ -2,7 +2,7 @@ use http_types::{Body, StatusCode};
 use opentelemetry::{
     global,
     metrics::{Counter, Unit, ValueRecorder},
-    sdk::Resource,
+    sdk::resource::Resource,
     Key, KeyValue,
 };
 use opentelemetry_prometheus::PrometheusExporter;

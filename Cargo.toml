@@ -42,9 +42,9 @@ trace = ["opentelemetry/trace"]
 metrics = ["opentelemetry/metrics", "opentelemetry-prometheus", "prometheus"]
 
 [dependencies]
-opentelemetry = "0.15"
-opentelemetry-prometheus = { version = "0.8", optional = true }
-opentelemetry-semantic-conventions = "0.7"
+opentelemetry = "0.16.0"
+opentelemetry-prometheus = { version = "0.9.0", optional = true }
+opentelemetry-semantic-conventions = "0.8.0"
 prometheus = { version = "0.12", optional = true }
 tide = "0.16"
 url = "2.2"
@@ -53,6 +53,6 @@ kv-log-macro = "1.0"
 
 [dev-dependencies]
 async-std = { version = "1.9", features = ["attributes"] }
-opentelemetry = { version = "0.15", features = ["async-std", "rt-async-std"] }
-opentelemetry-jaeger = { version = "0.14", features = ["async-std"] }
+opentelemetry = { version = "0.16.0", features = ["rt-async-std"] }
+opentelemetry-jaeger = { version = "0.15.0", features = ["rt-async-std"] }
 surf = "2.2"

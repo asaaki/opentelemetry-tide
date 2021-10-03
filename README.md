@@ -70,9 +70,9 @@ curl http://localhost:3000/metrics
 # ...
 
 [dependencies]
-async-std = { version = "1.9", features = ["attributes"] }
-opentelemetry = { version = "0.15", features = ["async-std", "rt-async-std"] }
-opentelemetry-jaeger = { version = "0.14", features = ["async-std"] }
+async-std = { version = "1.10", features = ["attributes"] }
+opentelemetry = { version = "0.16.0", features = ["rt-async-std"] }
+opentelemetry-jaeger = { version = "0.15.0", features = ["rt-async-std"] }
 opentelemetry-tide = "0.10"
 tide = "0.16"
 ```
@@ -82,7 +82,7 @@ tide = "0.16"
 ```rust
 use opentelemetry::{global, KeyValue, runtime};
 use opentelemetry_semantic_conventions::resource;
-use opentelemetry_tide::TideExt;
+use opentelemetry_tide::TideExt; // import trait
 
 const VERSION: &'static str = env!("CARGO_PKG_VERSION");
 
@@ -102,6 +102,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let mut app = tide::new();
 
+    // use the trait
     app.with_middlewares(tracer, Some(metrics_kvs));
 
     app.at("/").get(|_| async move {
@@ -128,16 +129,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 This crate uses ``#![forbid(unsafe_code)]`` to ensure everything is implemented in 100% Safe Rust.
 
-
-<!-- links -->
-[RED method]: https://www.weave.works/blog/the-red-method-key-metrics-for-microservices-architecture/
-
 ## License
 
 <sup>
 Licensed under either of
-  <a href="LICENSE-APACHE">Apache License, Version 2.0</a> or
-  <a href="LICENSE-MIT">MIT license</a>
+  <a href="https://raw.githubusercontent.com/asaaki/opentelemetry-tide/main/LICENSE-APACHE">Apache License, Version 2.0</a> or
+  <a href="https://raw.githubusercontent.com/asaaki/opentelemetry-tide/main/LICENSE-MIT">MIT license</a>
 at your option.
 </sup>
 
@@ -152,3 +149,4 @@ be dual licensed as above, without any additional terms or conditions.
 <!-- links -->
 [OpenTelemetry]: https://crates.io/crates/opentelemetry
 [Tide]: https://crates.io/crates/tide
+[RED method]: https://www.weave.works/blog/the-red-method-key-metrics-for-microservices-architecture/
