@@ -54,5 +54,5 @@ kv-log-macro = "1.0"
 [dev-dependencies]
 async-std = { version = "1.9", features = ["attributes"] }
 opentelemetry = { version = "0.16", features = ["rt-async-std"] }
-opentelemetry-jaeger = { version = "0.15", features = ["rt-async-std"] }
+opentelemetry-jaeger = { version = "0.16", features = ["rt-async-std"] }
 surf = "2.2"
