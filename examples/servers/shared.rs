@@ -1,10 +1,10 @@
 #![doc(hidden)]
 #![allow(unused_imports)]
 
-use opentelemetry::sdk::{
+use opentelemetry::{sdk::{
     propagation::{BaggagePropagator, TextMapCompositePropagator, TraceContextPropagator},
-    trace::{self, Config, Sampler, Tracer},
-};
+    trace::{self, Config, Sampler, Tracer}, Resource,
+}, global::BoxedTracer, trace::TracerProvider};
 use opentelemetry::{global, trace::TraceError, KeyValue};
 use opentelemetry_jaeger::Propagator as JaegerPropagator;
 use opentelemetry_semantic_conventions::resource;
@@ -18,13 +18,13 @@ pub fn init_global_propagator() {
 }
 
 fn composite_propagator() -> TextMapCompositePropagator {
-    // W3C spec: https://w3c.github.io/baggage/ - very flexible KV format, can carry more than just trace context data
-    let baggage_propagator = BaggagePropagator::new();
-
     // Uber's original format - probably only useful in a closed jaeger only setup
     let jaeger_propagator = JaegerPropagator::new(); // aka Uber headers
 
-    // Yet another W3C spec: https://www.w3.org/TR/trace-context/ - only for trace context info
+    // W3C spec: https://w3c.github.io/baggage/ - very flexible KV format, can carry more than just trace context data
+    let baggage_propagator = BaggagePropagator::new();
+
+    // W3C spec: https://www.w3.org/TR/trace-context/ - only for trace context info
     let trace_context_propagator = TraceContextPropagator::new();
 
     // NB! last wins (and overwrites!); so re-order based on your actual usage or preferences
@@ -38,13 +38,7 @@ fn composite_propagator() -> TextMapCompositePropagator {
 }
 
 #[allow(dead_code)]
-pub fn trace_config() -> Config {
-    trace::config()
-    // can accept more options like:
-    // .with_sampler(Sampler::TraceIdRatioBased(0.2))
-}
-
-pub fn jaeger_tracer(svc_name: &str, version: &str, instance_id: &str) -> Result<Tracer, TraceError> {
+pub fn trace_config(version: &str, instance_id: &str) -> Config {
     let tags = [
         resource::SERVICE_VERSION.string(version.to_owned()),
         resource::SERVICE_INSTANCE_ID.string(instance_id.to_owned()),
@@ -53,8 +47,17 @@ pub fn jaeger_tracer(svc_name: &str, version: &str, instance_id: &str) -> Result
         KeyValue::new("process.executable.profile", PROFILE),
     ];
 
+    trace::config().with_resource(Resource::new(tags))
+}
+
+pub fn jaeger_tracer(svc_name: &str, version: &str, instance_id: &str) -> Result<Tracer, TraceError> {
     opentelemetry_jaeger::new_pipeline()
         .with_service_name(svc_name)
-        .with_tags(tags.iter().map(ToOwned::to_owned))
+        .with_trace_config(trace_config(version, instance_id))
         .install_batch(opentelemetry::runtime::AsyncStd)
+}
+
+pub fn global_tracer(svc_name: &'static str, version: &str, instance_id: &str) -> Result<BoxedTracer, TraceError> {
+    let _ = jaeger_tracer(svc_name, version, instance_id)?;
+    Ok(global::tracer(svc_name))
 }

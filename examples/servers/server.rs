@@ -14,7 +14,7 @@ curl 'http://127.0.0.1:3000/' -H 'traceparent: 00-001100220033004400550066007700
 ```
 */
 
-use opentelemetry_tide::{MetricsConfig, TideExt};
+use opentelemetry_tide::TideExt;
 
 mod shared;
 
@@ -25,13 +25,12 @@ const VERSION: &str = env!("CARGO_PKG_VERSION");
 
 #[async_std::main]
 async fn main() -> MainResult {
-    // tide::log::with_level(tide::log::LevelFilter::Warn);
-    tide::log::with_level(tide::log::LevelFilter::Debug);
+    tide::log::with_level(tide::log::LevelFilter::Warn);
     shared::init_global_propagator();
-    let tracer = shared::jaeger_tracer(SVC_NAME, VERSION, "backend-123")?;
+    let _tracer = shared::global_tracer(SVC_NAME, VERSION, "backend-123")?;
 
     let mut app = tide::new();
-    app.with_middlewares(tracer, MetricsConfig::default());
+    app.with_default_middlewares();
     app.at("/").get(|_| async move { Ok("Hello, OpenTelemetry!") });
 
     app.listen("0.0.0.0:3000").await?;

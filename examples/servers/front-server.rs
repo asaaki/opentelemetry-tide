@@ -37,7 +37,7 @@ const UPSTREAM_SERVICE: &str = "http://localhost:3000/";
 async fn main() -> MainResult {
     tide::log::with_level(tide::log::LevelFilter::Warn);
     shared::init_global_propagator();
-    let tracer = shared::jaeger_tracer(SVC_NAME, VERSION, "frontend-753")?;
+    let tracer = shared::global_tracer(SVC_NAME, VERSION, "frontend-753")?;
 
     let mut app = tide::with_state(surf::client());
     let route = std::env::var("METRICS_ROUTE").unwrap_or_else(|_| "/metrics".into());
@@ -62,7 +62,7 @@ async fn main() -> MainResult {
             surf_request.insert_header(k.as_str(), v.as_str());
         }
 
-        span.add_event("upstream.request.started".into(), vec![]);
+        span.add_event("upstream.request.started", vec![]);
         let upstream_res = async {
             let tracer = global::tracer("(child)");
             let span = tracer.start("surf.client.send");
@@ -80,7 +80,7 @@ async fn main() -> MainResult {
                 .await
                 .unwrap()
         );
-        span.add_event("upstream.request.finished".into(), vec![]);
+        span.add_event("upstream.request.finished", vec![]);
 
         Ok(body)
     });
