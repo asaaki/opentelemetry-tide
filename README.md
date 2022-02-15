@@ -121,9 +121,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 |      flag | description |
 | --------: | :---------- |
-|   `trace` | enables **tracing** middleware; enabled by default via `full`
-| `metrics` | enables **metrics** middleware; enabled by default via `full`
-|    `full` | includes both `trace` and `metrics` features, enabled by default
+|   `trace` | enables **tracing** middleware; enabled by default
+| `metrics` | enables **metrics** middleware; enabled by default
 
 ## Safety
 

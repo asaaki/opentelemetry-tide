@@ -10,6 +10,8 @@ Additional changes to original format:
 - `Thank you for your contribution` for shout-outs to the community
 
 ## [Unreleased]
+### Changed
+- Remove `full` as a feature flag (no real value; all features are enabled by default)
 
 ## [0.12.0] - 2022-02-15
 ### Changed

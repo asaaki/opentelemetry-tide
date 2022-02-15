@@ -35,8 +35,7 @@ name = "front-server"
 path = "examples/servers/front-server.rs"
 
 [features]
-default = ["full"]
-full = ["trace", "metrics"]
+default = ["trace", "metrics"]
 
 trace = ["opentelemetry/trace"]
 metrics = ["opentelemetry/metrics", "opentelemetry-prometheus", "prometheus"]
