@@ -1,11 +1,16 @@
 #![doc(hidden)]
 #![allow(unused_imports)]
 
-use opentelemetry::{sdk::{
-    propagation::{BaggagePropagator, TextMapCompositePropagator, TraceContextPropagator},
-    trace::{self, Config, Sampler, Tracer}, Resource,
-}, global::BoxedTracer, trace::TracerProvider};
 use opentelemetry::{global, trace::TraceError, KeyValue};
+use opentelemetry::{
+    global::BoxedTracer,
+    sdk::{
+        propagation::{BaggagePropagator, TextMapCompositePropagator, TraceContextPropagator},
+        trace::{self, Config, Sampler, Tracer},
+        Resource,
+    },
+    trace::TracerProvider,
+};
 use opentelemetry_jaeger::Propagator as JaegerPropagator;
 use opentelemetry_semantic_conventions::resource;
 

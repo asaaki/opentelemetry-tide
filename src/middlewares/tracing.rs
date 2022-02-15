@@ -51,18 +51,13 @@ impl OpenTelemetryTracingMiddleware {
     /// app.at("/").get(|_| async { Ok("Traced!") });
     /// ```
     pub fn new_from_global() -> Self {
-        let tracer = global::tracer_provider()
-        .versioned_tracer(crate::CRATE_NAME, Some(crate::VERSION),
-                None);
+        let tracer = global::tracer_provider().versioned_tracer(crate::CRATE_NAME, Some(crate::VERSION), None);
         Self::new(tracer)
-
     }
 }
 
 #[tide::utils::async_trait]
-impl<State: Clone + Send + Sync + 'static> Middleware<State>
-    for OpenTelemetryTracingMiddleware
-{
+impl<State: Clone + Send + Sync + 'static> Middleware<State> for OpenTelemetryTracingMiddleware {
     async fn handle(&self, req: Request<State>, next: Next<'_, State>) -> Result {
         // gather trace data from request, used later to conditionally add remote trace info from upstream service
         let mut req_headers = HashMap::new();
@@ -108,7 +103,8 @@ impl<State: Clone + Send + Sync + 'static> Middleware<State>
             attributes.push(trace::HTTP_CLIENT_IP.string(addr.to_string()));
         }
 
-        let span_builder = self.tracer
+        let span_builder = self
+            .tracer
             .span_builder(format!("{} {}", method, url))
             .with_kind(SpanKind::Server)
             .with_attributes(attributes);
