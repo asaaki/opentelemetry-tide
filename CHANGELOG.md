@@ -11,6 +11,31 @@ Additional changes to original format:
 
 ## [Unreleased]
 
+## [0.12.0] - 2022-02-15
+### Changed
+- Update dependencies and fix breaking changes
+
+  ```toml
+  opentelemetry = "0.17"
+  opentelemetry-prometheus = { version = "0.10", optional = true }
+  opentelemetry-semantic-conventions = "0.9"
+  prometheus = { version = "0.13", optional = true }
+  ```
+
+  Due to lifetime and thread-safety issues (non-Send across await point),
+  a switch to `BoxedTracer` was necessary. Since most examples and implementation do that,
+  this crate gets in line with the others now.
+- Ensure that docs are generated for both middlewares (`#[cfg(any(…, doc))]`)
+
+### Added
+- More default methods to set up the middlewares (via `opentelemetry_tide::TideExt`):
+
+  - `.with_default_metrics_middleware()`
+  - `.with_default_tracing_middleware()`
+  - `.with_default_middlewares()`
+
+  This should avoid the need to pass in a tracer for common scenarios.
+
 ## [0.11.0] - 2021-10-03 — _German Unity Edition_
 ### Changed
 - Update dependencies
@@ -188,7 +213,8 @@ _(not released to crates.io)_
 ## [0.1.0] - 2020-08-01
 **Initial release**
 
-[Unreleased]: https://github.com/asaaki/opentelemetry-tide/compare/v0.11.0...HEAD
+[Unreleased]: https://github.com/asaaki/opentelemetry-tide/compare/v0.12.0...HEAD
+[0.11.0]: https://github.com/asaaki/opentelemetry-tide/compare/v0.11.0...v0.12.0
 [0.11.0]: https://github.com/asaaki/opentelemetry-tide/compare/v0.10.0...v0.11.0
 [0.10.0]: https://github.com/asaaki/opentelemetry-tide/compare/v0.9.0...v0.10.0
 [0.9.0]: https://github.com/asaaki/opentelemetry-tide/compare/v0.8.0...v0.9.0

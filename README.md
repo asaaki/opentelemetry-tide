@@ -71,9 +71,9 @@ curl http://localhost:3000/metrics
 
 [dependencies]
 async-std = { version = "1.10", features = ["attributes"] }
-opentelemetry = { version = "0.16.0", features = ["rt-async-std"] }
-opentelemetry-jaeger = { version = "0.15.0", features = ["rt-async-std"] }
-opentelemetry-tide = "0.10"
+opentelemetry = { version = "0.17.0", features = ["rt-async-std"] }
+opentelemetry-jaeger = { version = "0.16.0", features = ["rt-async-std"] }
+opentelemetry-tide = "0.12"
 tide = "0.16"
 ```
 
@@ -92,11 +92,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let tags = [resource::SERVICE_VERSION.string(VERSION)];
 
-    let tracer = opentelemetry_jaeger::new_pipeline()
-        .with_service_name("example-server")
+    let _tracer = opentelemetry_jaeger::new_pipeline()
         .with_tags(tags.iter().map(ToOwned::to_owned))
         .install_batch(runtime::AsyncStd)
         .expect("pipeline install failure");
+    let tracer = global::tracer("example-server");
 
     let metrics_kvs = vec![KeyValue::new("K", "V")];
 
