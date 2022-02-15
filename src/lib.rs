@@ -6,24 +6,23 @@
 )]
 #![forbid(unsafe_code)]
 #![cfg_attr(feature = "docs", feature(doc_cfg))]
+#![deny(clippy::unwrap_used)]
+#![deny(missing_debug_implementations)]
 #![deny(missing_docs)]
 #![deny(unused_imports)]
-#![deny(missing_debug_implementations)]
-#![warn(clippy::expect_used)]
-#![deny(clippy::unwrap_used)]
 #![deny(unused_results)]
+#![warn(clippy::expect_used)]
 
-use opentelemetry::trace::Tracer;
-
+use opentelemetry::global::BoxedTracer;
 const CRATE_NAME: &str = env!("CARGO_CRATE_NAME");
 const VERSION: &str = env!("CARGO_PKG_VERSION");
 
 mod middlewares;
 
-#[cfg(feature = "trace")]
+#[cfg(any(feature = "trace", doc))]
 pub use middlewares::tracing::OpenTelemetryTracingMiddleware;
 
-#[cfg(feature = "metrics")]
+#[cfg(any(feature = "metrics", doc))]
 pub use middlewares::metrics::{MetricsConfig, OpenTelemetryMetricsMiddleware};
 
 /// this extension trait provides convenience methods for attaching middlewares of this crate
@@ -33,10 +32,19 @@ pub trait TideExt<S> {
 
     See [OpenTelemetryTracingMiddleware::new] for details.
     */
-    #[cfg(feature = "trace")]
-    fn with_tracing_middleware<T>(&mut self, tracer: T) -> &mut Self
+    #[cfg(any(feature = "trace", doc))]
+    fn with_tracing_middleware(&mut self, tracer: BoxedTracer) -> &mut Self
     where
-        T: Tracer + Send + Sync,
+        S: Clone + Send + Sync + 'static;
+
+    /**
+    Attaches tracing middleware with the global tracer as default.
+
+    See [OpenTelemetryTracingMiddleware::new] for details.
+    */
+    #[cfg(any(feature = "trace", doc))]
+    fn with_default_tracing_middleware(&mut self) -> &mut Self
+    where
         S: Clone + Send + Sync + 'static;
 
     /**
@@ -44,8 +52,18 @@ pub trait TideExt<S> {
 
     See [OpenTelemetryMetricsMiddleware::new] for details.
     */
-    #[cfg(feature = "metrics")]
+    #[cfg(any(feature = "metrics", doc))]
     fn with_metrics_middleware(&mut self, config: MetricsConfig) -> &mut Self
+    where
+        S: Clone + Send + Sync + 'static;
+
+    /**
+    Attaches metrics middleware with default MetricsConfig.
+
+    See [OpenTelemetryMetricsMiddleware::new] for details.
+    */
+    #[cfg(any(feature = "metrics", doc))]
+    fn with_default_metrics_middleware(&mut self) -> &mut Self
     where
         S: Clone + Send + Sync + 'static;
 
@@ -54,24 +72,40 @@ pub trait TideExt<S> {
 
     See [OpenTelemetryTracingMiddleware::new] and [OpenTelemetryMetricsMiddleware::new] for details.
     */
-    #[cfg(all(feature = "trace", feature = "metrics"))]
-    fn with_middlewares<T>(&mut self, tracer: T, config: MetricsConfig) -> &mut Self
+    #[cfg(any(all(feature = "trace", feature = "metrics"), doc))]
+    fn with_middlewares(&mut self, tracer: BoxedTracer, config: MetricsConfig) -> &mut Self
     where
-        T: Tracer + Send + Sync,
+        S: Clone + Send + Sync + 'static;
+
+    /**
+    Attaches both middlewares with their defaults.
+
+    See [OpenTelemetryTracingMiddleware::default] and [OpenTelemetryMetricsMiddleware::default] for details.
+    */
+    #[cfg(any(all(feature = "trace", feature = "metrics"), doc))]
+    fn with_default_middlewares(&mut self) -> &mut Self
+    where
         S: Clone + Send + Sync + 'static;
 }
 
 impl<S> TideExt<S> for tide::Server<S> {
-    #[cfg(feature = "trace")]
-    fn with_tracing_middleware<T>(&mut self, tracer: T) -> &mut Self
+    #[cfg(any(feature = "trace", doc))]
+    fn with_tracing_middleware(&mut self, tracer: BoxedTracer) -> &mut Self
     where
-        T: Tracer + Send + Sync,
         S: Clone + Send + Sync + 'static,
     {
         self.with(OpenTelemetryTracingMiddleware::new(tracer))
     }
 
-    #[cfg(feature = "metrics")]
+    #[cfg(any(feature = "trace", doc))]
+    fn with_default_tracing_middleware(&mut self) -> &mut Self
+    where
+        S: Clone + Send + Sync + 'static,
+    {
+        self.with(OpenTelemetryTracingMiddleware::default())
+    }
+
+    #[cfg(any(feature = "metrics", doc))]
     fn with_metrics_middleware(&mut self, config: MetricsConfig) -> &mut Self
     where
         S: Clone + Send + Sync + 'static,
@@ -79,13 +113,29 @@ impl<S> TideExt<S> for tide::Server<S> {
         self.with(OpenTelemetryMetricsMiddleware::new(config))
     }
 
-    #[cfg(all(feature = "trace", feature = "metrics"))]
-    fn with_middlewares<T>(&mut self, tracer: T, config: MetricsConfig) -> &mut Self
+    #[cfg(any(feature = "metrics", doc))]
+    fn with_default_metrics_middleware(&mut self) -> &mut Self
     where
-        T: Tracer + Send + Sync,
+        S: Clone + Send + Sync + 'static,
+    {
+        self.with(OpenTelemetryMetricsMiddleware::default())
+    }
+
+    #[cfg(any(all(feature = "trace", feature = "metrics"), doc))]
+    fn with_middlewares(&mut self, tracer: BoxedTracer, config: MetricsConfig) -> &mut Self
+    where
         S: Clone + Send + Sync + 'static,
     {
         self.with(OpenTelemetryTracingMiddleware::new(tracer))
             .with(OpenTelemetryMetricsMiddleware::new(config))
+    }
+
+    #[cfg(any(all(feature = "trace", feature = "metrics"), doc))]
+    fn with_default_middlewares(&mut self) -> &mut Self
+    where
+        S: Clone + Send + Sync + 'static,
+    {
+        self.with(OpenTelemetryTracingMiddleware::default())
+            .with(OpenTelemetryMetricsMiddleware::default())
     }
 }

@@ -1,8 +1,8 @@
 use http_types::headers::{HeaderName, HeaderValue};
 use kv_log_macro as log;
 use opentelemetry::{
-    global,
-    trace::{FutureExt, Span, SpanKind, StatusCode, TraceContextExt, Tracer},
+    global::{self, BoxedTracer},
+    trace::{FutureExt, Span, SpanKind, StatusCode, TraceContextExt, Tracer, TracerProvider},
     Context,
 };
 use opentelemetry_semantic_conventions::{resource, trace};
@@ -12,13 +12,21 @@ use tide::{http::Version, Middleware, Next, Request, Result};
 use url::Url;
 
 /// The middleware struct to be used in tide
-#[derive(Default, Debug)]
-pub struct OpenTelemetryTracingMiddleware<T: Tracer> {
-    tracer: T,
+#[derive(Debug)]
+pub struct OpenTelemetryTracingMiddleware {
+    tracer: BoxedTracer,
 }
 
-impl<T: Tracer> OpenTelemetryTracingMiddleware<T> {
-    /// Instantiate the middleware
+impl Default for OpenTelemetryTracingMiddleware {
+    /// Instantiate the middleware with the global tracer;
+    /// see [OpenTelemetryTracingMiddleware::new_from_global] for details/example.
+    fn default() -> Self {
+        Self::new_from_global()
+    }
+}
+
+impl OpenTelemetryTracingMiddleware {
+    /// Instantiate the middleware with a provided `BoxedTracer`
     ///
     /// # Examples
     ///
@@ -28,14 +36,32 @@ impl<T: Tracer> OpenTelemetryTracingMiddleware<T> {
     /// app.with(opentelemetry_tide::OpenTelemetryTracingMiddleware::new(tracer));
     /// app.at("/").get(|_| async { Ok("Traced!") });
     /// ```
-    pub fn new(tracer: T) -> Self {
+    pub fn new(tracer: BoxedTracer) -> Self {
         Self { tracer }
+    }
+
+    /// Instantiate the middleware with the global tracer
+    ///
+    /// # Examples
+    ///
+    /// ```rust,no_run
+    /// let mut app = tide::new();
+    /// let tracer = opentelemetry_jaeger::new_pipeline().install_batch(opentelemetry::runtime::AsyncStd).unwrap();
+    /// app.with(opentelemetry_tide::OpenTelemetryTracingMiddleware::new_from_global());
+    /// app.at("/").get(|_| async { Ok("Traced!") });
+    /// ```
+    pub fn new_from_global() -> Self {
+        let tracer = global::tracer_provider()
+        .versioned_tracer(crate::CRATE_NAME, Some(crate::VERSION),
+                None);
+        Self::new(tracer)
+
     }
 }
 
 #[tide::utils::async_trait]
-impl<T: Tracer + Send + Sync, State: Clone + Send + Sync + 'static> Middleware<State>
-    for OpenTelemetryTracingMiddleware<T>
+impl<State: Clone + Send + Sync + 'static> Middleware<State>
+    for OpenTelemetryTracingMiddleware
 {
     async fn handle(&self, req: Request<State>, next: Next<'_, State>) -> Result {
         // gather trace data from request, used later to conditionally add remote trace info from upstream service
@@ -82,20 +108,15 @@ impl<T: Tracer + Send + Sync, State: Clone + Send + Sync + 'static> Middleware<S
             attributes.push(trace::HTTP_CLIENT_IP.string(addr.to_string()));
         }
 
-        let mut span_builder = self
-            .tracer
+        let span_builder = self.tracer
             .span_builder(format!("{} {}", method, url))
             .with_kind(SpanKind::Server)
             .with_attributes(attributes);
-
-        // make sure our span can be connected to a currently open/active (remote) trace if existing
-        // if let Some(remote_span_ctx) = parent_cx.span().span_context() {
-        // }
-        if parent_cx.span().span_context().is_remote() {
-            span_builder = span_builder.with_parent_context(parent_cx.clone());
-        }
-
-        let mut span = span_builder.start(&self.tracer);
+        let mut span = if parent_cx.span().span_context().is_remote() {
+            span_builder.start_with_context(&self.tracer, &parent_cx)
+        } else {
+            span_builder.start(&self.tracer)
+        };
         span.add_event("request.started".to_owned(), vec![]);
         let cx = &Context::current_with_span(span);
 

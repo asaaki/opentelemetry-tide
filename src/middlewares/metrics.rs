@@ -16,6 +16,8 @@ const ROUTE_KEY: Key = Key::from_static_str("http_route");
 const METHOD_KEY: Key = Key::from_static_str("http_method");
 const STATUS_KEY: Key = Key::from_static_str("http_status_code");
 
+// TODO: 31 buckets (+Inf) are a lot;
+// try to find better bucket thresholds with less buckets
 #[rustfmt::skip]
 const HISTOGRAM_BOUNDARIES: [f64; 31] = [
     0.001, 0.002, 0.004, 0.006, 0.008,
@@ -116,7 +118,7 @@ impl OpenTelemetryMetricsMiddleware {
     /// let mut app = tide::new();
     /// let mut config = opentelemetry_tide::MetricsConfig::default();
     /// config.global_tags = Some(vec![opentelemetry::KeyValue::new("K","V")];)
-    /// app.with(opentelemetry_tide::OpenTelemetryMetricsMiddleware::new(Some(custom_kvs)));
+    /// app.with(opentelemetry_tide::OpenTelemetryMetricsMiddleware::new(config));
     /// app.at("/").get(|_| async { Ok("Metricized!") });
     /// ```
     pub fn new(config: MetricsConfig) -> Self {
@@ -127,14 +129,17 @@ impl OpenTelemetryMetricsMiddleware {
         // * https://grafana.com/files/grafanacon_eu_2018/Tom_Wilkie_GrafanaCon_EU_2018.pdf
         // * http://www.brendangregg.com/usemethod.html
         let meter = global::meter("red-metrics");
+
         let request_count = meter
             .u64_counter("http_server_requests_count")
             .with_description("total request count (since start of service)")
             .init();
+
         let error_count = meter
             .u64_counter("http_server_errors_count")
             .with_description("failed request count (since start of service)")
             .init();
+
         let duration = meter
             .f64_value_recorder("http_server_request_duration_seconds")
             .with_unit(Unit::new("seconds"))
