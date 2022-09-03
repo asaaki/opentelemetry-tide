@@ -95,8 +95,9 @@ impl<State: Clone + Send + Sync + 'static> Middleware<State> for OpenTelemetryTr
             attributes.push(trace::NET_HOST_PORT.i64(port.into()));
         }
 
-        if let Some(addr) = req.remote().and_then(socket_str_to_ip) {
-            attributes.push(trace::NET_PEER_IP.string(addr.to_string()));
+        if let Some(sockaddr) = req.peer_addr().and_then(|sockaddr| SocketAddr::from_str(sockaddr).ok()) {
+            attributes.push(trace::NET_PEER_IP.string(sockaddr.ip().to_string()));
+            attributes.push(trace::NET_PEER_PORT.string(sockaddr.port().to_string()));
         }
 
         if let Some(addr) = req.peer_addr().and_then(socket_str_to_ip) {
