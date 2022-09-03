@@ -100,8 +100,8 @@ impl<State: Clone + Send + Sync + 'static> Middleware<State> for OpenTelemetryTr
             attributes.push(trace::NET_PEER_PORT.string(sockaddr.port().to_string()));
         }
 
-        if let Some(addr) = req.peer_addr().and_then(socket_str_to_ip) {
-            attributes.push(trace::HTTP_CLIENT_IP.string(addr.to_string()));
+        if let Some(ipaddr) = req.remote().and_then(|ipaddr| IpAddr::from_str(ipaddr).ok()) {
+            attributes.push(trace::HTTP_CLIENT_IP.string(ipaddr.to_string()));
         }
 
         let span_builder = self
@@ -174,11 +174,6 @@ fn http_target(url: &Url) -> String {
         target.push_str(f);
     }
     target
-}
-
-#[inline]
-fn socket_str_to_ip(socket: &str) -> Option<IpAddr> {
-    SocketAddr::from_str(socket).ok().map(|s| s.ip())
 }
 
 #[inline]
